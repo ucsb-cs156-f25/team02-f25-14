@@ -31,7 +31,7 @@ public class RecommendationRequestController extends ApiController {
 
   @Autowired RecommendationRequestRepository recommendationrequestRepository;
 
-  @Operation(summary = "List all ucsb dates")
+  @Operation(summary = "List all ucsb requests")
   @PreAuthorize("hasRole('ROLE_USER')")
   @GetMapping("/all")
   public Iterable<RecommendationRequest> allRecommendationRequests() {
