@@ -59,7 +59,7 @@
                   },
                   {
                     "column": {
-                      "name": "DATENEEDED",
+                      "name": "DATE_NEEDED",
                       "type": "TIMESTAMP"
                     }
                   },
