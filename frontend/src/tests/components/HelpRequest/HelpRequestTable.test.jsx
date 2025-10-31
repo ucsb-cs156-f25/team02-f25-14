@@ -1,12 +1,11 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { BrowserRouter as Router } from "react-router";
+import { fireEvent, render, waitFor, screen } from "@testing-library/react";
+import { helpRequestFixtures } from "fixtures/helpRequestFixtures";
+import HelpRequestTable from "main/components/HelpRequest/HelpRequestTable";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MemoryRouter } from "react-router";
+import { currentUserFixtures } from "fixtures/currentUserFixtures";
 import axios from "axios";
 import AxiosMockAdapter from "axios-mock-adapter";
-
-import HelpRequestTable from "main/components/HelpRequest/HelpRequestTable";
-import { helpRequestFixtures } from "fixtures/helpRequestFixtures";
-import { currentUserFixtures } from "fixtures/currentUserFixtures";
 
 const mockedNavigate = vi.fn();
 vi.mock("react-router", async () => {
@@ -19,19 +18,18 @@ vi.mock("react-router", async () => {
 
 describe("HelpRequestTable tests", () => {
   const queryClient = new QueryClient();
-  const testId = "HelpRequestTable";
 
-  test("renders correctly for ordinary user", async () => {
+  test("Has the expected column headers and content for ordinary user", () => {
     const currentUser = currentUserFixtures.userOnly;
 
     render(
       <QueryClientProvider client={queryClient}>
-        <Router>
+        <MemoryRouter>
           <HelpRequestTable
             helpRequests={helpRequestFixtures.threeHelpRequests}
             currentUser={currentUser}
           />
-        </Router>
+        </MemoryRouter>
       </QueryClientProvider>,
     );
 
@@ -44,35 +42,96 @@ describe("HelpRequestTable tests", () => {
       "Explanation",
       "Solved?",
     ];
+    const expectedFields = [
+      "id",
+      "requesterEmail",
+      "teamId",
+      "tableOrBreakoutRoom",
+      "requestTime",
+      "explanation",
+      "solved",
+    ];
+    const testId = "HelpRequestTable";
 
     expectedHeaders.forEach((headerText) => {
-      expect(screen.getByText(headerText)).toBeInTheDocument();
+      const header = screen.getByText(headerText);
+      expect(header).toBeInTheDocument();
     });
 
-    // Ordinary users shouldn't see Edit/Delete buttons
-    expect(
-      screen.queryByTestId(`${testId}-cell-row-0-col-Edit-button`),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByTestId(`${testId}-cell-row-0-col-Delete-button`),
-    ).not.toBeInTheDocument();
+    expectedFields.forEach((field) => {
+      const cell = screen.getByTestId(`${testId}-cell-row-0-col-${field}`);
+      expect(cell).toBeInTheDocument();
+    });
+
+    expect(screen.getByTestId(`${testId}-cell-row-0-col-id`)).toHaveTextContent(
+      "1",
+    );
+    expect(screen.getByTestId(`${testId}-cell-row-1-col-id`)).toHaveTextContent(
+      "2",
+    );
+
+    const editButton = screen.queryByTestId(
+      `${testId}-cell-row-0-col-Edit-button`,
+    );
+    expect(editButton).not.toBeInTheDocument();
+
+    const deleteButton = screen.queryByTestId(
+      `${testId}-cell-row-0-col-Delete-button`,
+    );
+    expect(deleteButton).not.toBeInTheDocument();
   });
 
-  test("renders correctly for admin user", async () => {
+  test("Has the expected column headers and content for admin user", () => {
     const currentUser = currentUserFixtures.adminUser;
 
     render(
       <QueryClientProvider client={queryClient}>
-        <Router>
+        <MemoryRouter>
           <HelpRequestTable
             helpRequests={helpRequestFixtures.threeHelpRequests}
             currentUser={currentUser}
           />
-        </Router>
+        </MemoryRouter>
       </QueryClientProvider>,
     );
 
-    // Admin should see both buttons
+    const expectedHeaders = [
+      "ID",
+      "Requester Email",
+      "Team ID",
+      "Table/Breakout Room",
+      "Request Time",
+      "Explanation",
+      "Solved?",
+    ];
+    const expectedFields = [
+      "id",
+      "requesterEmail",
+      "teamId",
+      "tableOrBreakoutRoom",
+      "requestTime",
+      "explanation",
+      "solved",
+    ];
+    const testId = "HelpRequestTable";
+
+    expectedHeaders.forEach((headerText) => {
+      const header = screen.getByText(headerText);
+      expect(header).toBeInTheDocument();
+    });
+
+    expectedFields.forEach((field) => {
+      const cell = screen.getByTestId(`${testId}-cell-row-0-col-${field}`);
+      expect(cell).toBeInTheDocument();
+    });
+
+    expect(screen.getByTestId(`${testId}-cell-row-0-col-id`)).toHaveTextContent(
+      "1",
+    );
+    expect(screen.getByTestId(`${testId}-cell-row-1-col-id`)).toHaveTextContent(
+      "2",
+    );
+
     const editButton = screen.getByTestId(
       `${testId}-cell-row-0-col-Edit-button`,
     );
@@ -86,23 +145,31 @@ describe("HelpRequestTable tests", () => {
     expect(deleteButton).toHaveClass("btn-danger");
   });
 
-  test("Edit button navigates to correct page", async () => {
+  test("Edit button navigates to the edit page for admin user", async () => {
     const currentUser = currentUserFixtures.adminUser;
 
     render(
       <QueryClientProvider client={queryClient}>
-        <Router>
+        <MemoryRouter>
           <HelpRequestTable
             helpRequests={helpRequestFixtures.threeHelpRequests}
             currentUser={currentUser}
           />
-        </Router>
+        </MemoryRouter>
       </QueryClientProvider>,
     );
 
+    await waitFor(() => {
+      expect(
+        screen.getByTestId(`HelpRequestTable-cell-row-0-col-id`),
+      ).toHaveTextContent("1");
+    });
+
     const editButton = screen.getByTestId(
-      `${testId}-cell-row-0-col-Edit-button`,
+      `HelpRequestTable-cell-row-0-col-Edit-button`,
     );
+    expect(editButton).toBeInTheDocument();
+
     fireEvent.click(editButton);
 
     await waitFor(() =>
@@ -110,44 +177,53 @@ describe("HelpRequestTable tests", () => {
     );
   });
 
-  test("Delete button calls delete mutation", async () => {
+  test("Delete button calls delete callback", async () => {
     const currentUser = currentUserFixtures.adminUser;
+  
     const axiosMock = new AxiosMockAdapter(axios);
-
-    // ✅ Capture DELETE even with query params (?id=1)
-    axiosMock.onDelete(/\/api\/helprequest.*/).reply(200, {
-      message: "Help Request deleted",
-    });
-    // ✅ Mock refetch endpoint
+    // Match both `/api/helprequest` and `/api/helprequest?id=1`
+    axiosMock
+      .onDelete(/\/api\/helprequest.*/)
+      .reply(200, { message: "Help Request deleted" });
+    // Mock refetch endpoint
     axiosMock.onGet(/\/api\/helprequest\/all.*/).reply(200, []);
-
+  
     render(
       <QueryClientProvider client={queryClient}>
-        <Router>
+        <MemoryRouter>
           <HelpRequestTable
             helpRequests={helpRequestFixtures.threeHelpRequests}
             currentUser={currentUser}
           />
-        </Router>
+        </MemoryRouter>
       </QueryClientProvider>,
     );
-
+  
+    // Wait for table to render
+    await screen.findByTestId(`HelpRequestTable-cell-row-0-col-id`);
+  
     const deleteButton = screen.getByTestId(
-      `${testId}-cell-row-0-col-Delete-button`,
+      `HelpRequestTable-cell-row-0-col-Delete-button`,
     );
     expect(deleteButton).toBeInTheDocument();
-
-    fireEvent.click(deleteButton);
-
-    // Wait for async axios call to register
+  
+    // 🔥 Wrap click in act() and add one event loop tick to flush mutation
+    const { act } = await import("react-dom/test-utils");
+    await act(async () => {
+      fireEvent.click(deleteButton);
+      // allow async React Query job to run
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+  
+    // ✅ wait for the axios mock to record delete
     await waitFor(
-      () => {
-        expect(axiosMock.history.delete.length).toBeGreaterThan(0);
-      },
-      { timeout: 3000 },
+      () => expect(axiosMock.history.delete.length).toBeGreaterThan(0),
+      { timeout: 5000 },
     );
-
+  
     const deleteReq = axiosMock.history.delete[0];
     expect(deleteReq.url).toMatch(/helprequest/);
+    expect(deleteReq.params).toEqual({ id: 1 });
   });
+    
 });

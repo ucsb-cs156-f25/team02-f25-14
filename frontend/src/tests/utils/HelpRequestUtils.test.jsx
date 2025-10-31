@@ -1,7 +1,7 @@
 import {
     onDeleteSuccess,
     cellToAxiosParamsDelete,
-  } from "main/utils/UCSBDateUtils";
+  } from "main/utils/HelpRequestUtils";
   import mockConsole from "tests/testutils/mockConsole";
   
   const mockToast = vi.fn();
@@ -35,7 +35,8 @@ import {
     describe("cellToAxiosParamsDelete", () => {
       test("It returns the correct axios params for delete", () => {
         // arrange
-        const cell = { row: { values: { id: 17 } } };
+        const cell = { row: { original: { id: 17 } } };
+
   
         // act
         const result = cellToAxiosParamsDelete(cell);

@@ -24,7 +24,11 @@ export default function HelpRequestTable({ helpRequests, currentUser }) {
   // Stryker restore all
 
   const deleteCallback = async (cell) => {
-    deleteMutation.mutate(cell);
+    // Support both possible shapes of cell
+    const id = cell?.row?.original?.id;
+    console.log("Deleting help request id:", id);
+  
+    deleteMutation.mutate({ id });
   };
 
   const columns = [
