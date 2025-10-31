@@ -9,13 +9,12 @@ export default {
   component: HelpRequestTable,
 };
 
-const Template = (args) => {
-  return <HelpRequestTable {...args} />;
-};
+const Template = (args) => <HelpRequestTable {...args} />;
 
 export const Empty = Template.bind({});
 Empty.args = {
   helpRequests: [],
+  currentUser: currentUserFixtures.userOnly,
 };
 
 export const ThreeItemsOrdinaryUser = Template.bind({});
