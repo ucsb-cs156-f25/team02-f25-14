@@ -83,7 +83,7 @@ describe("HelpRequestForm tests", () => {
   });
 
   test("no error messages on good input", async () => {
-    const mockSubmitAction = vi.fn(); // ✅ changed from jest.fn()
+    const mockSubmitAction = vi.fn(); 
 
     render(
       <Router>
@@ -122,10 +122,11 @@ describe("HelpRequestForm tests", () => {
       </Router>
     );
 
-    await screen.findByTestId("HelpRequestForm-cancel");
-    const cancelButton = screen.getByTestId("HelpRequestForm-cancel");
-    fireEvent.click(cancelButton);
+  const cancelButton = await screen.findByTestId("HelpRequestForm-cancel");
+  expect(cancelButton).toBeInTheDocument(); 
+  fireEvent.click(cancelButton);
 
-    await waitFor(() => expect(mockedNavigate).toHaveBeenCalledWith(-1));
+  await waitFor(() => expect(mockedNavigate).toHaveBeenCalledTimes(1));
+  await waitFor(() => expect(mockedNavigate).toHaveBeenCalledWith(-1));
   });
 });
