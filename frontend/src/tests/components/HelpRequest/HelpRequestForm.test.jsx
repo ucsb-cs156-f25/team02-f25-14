@@ -1,10 +1,10 @@
 import { render, waitFor, fireEvent, screen } from "@testing-library/react";
 import HelpRequestForm from "main/components/HelpRequest/HelpRequestForm";
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router } from "react-router";
 
 const mockedNavigate = vi.fn();
 
-vi.mock("react-router-dom", async (importOriginal) => {
+vi.mock("react-router", async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
