@@ -9,15 +9,18 @@ export default {
   component: HelpRequestTable,
 };
 
-const Template = (args) => <HelpRequestTable {...args} />;
+const Template = (args) => {
+  return <HelpRequestTable {...args} />;
+};
 
 export const Empty = Template.bind({});
+
 Empty.args = {
   helpRequests: [],
-  currentUser: currentUserFixtures.userOnly,
 };
 
 export const ThreeItemsOrdinaryUser = Template.bind({});
+
 ThreeItemsOrdinaryUser.args = {
   helpRequests: helpRequestFixtures.threeHelpRequests,
   currentUser: currentUserFixtures.userOnly,

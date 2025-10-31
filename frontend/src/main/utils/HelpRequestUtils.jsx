@@ -9,8 +9,7 @@ export function cellToAxiosParamsDelete(cell) {
   return {
     url: "/api/helprequest",
     method: "DELETE",
-    params: {
-      id: cell.row.original.id,
+    params: { id: cell.row.values.id,
     },
   };
 }
