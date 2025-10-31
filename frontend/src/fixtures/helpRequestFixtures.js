@@ -5,7 +5,7 @@ const helpRequestFixtures = {
     teamId: "team02",
     tableOrBreakoutRoom: "5",
     requestTime: "2025-10-29T12:30:00",
-    explanation: "Need help with debugging a Java Spring issue",
+    explanation: "Need help with a merge conflict",
     solved: false
 },
 threeHelpRequests: [
@@ -15,7 +15,7 @@ threeHelpRequests: [
     teamId: "team02",
     tableOrBreakoutRoom: "5",
     requestTime: "2025-10-29T12:30:00",
-    explanation: "Need help with debugging a Java Spring issue",
+    explanation: "Need help with Dokku",
     solved: false
     },
     {
