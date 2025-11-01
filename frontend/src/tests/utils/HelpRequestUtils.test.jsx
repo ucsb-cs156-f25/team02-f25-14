@@ -36,8 +36,6 @@ import {
       test("It returns the correct axios params for delete", () => {
         // arrange
         const cell = { row: { original: { id: 17 } } };
-
-  
         // act
         const result = cellToAxiosParamsDelete(cell);
   
@@ -48,6 +46,33 @@ import {
           params: { id: 17 },
         });
       });
+      test("returns correct axios params with row.original.id fallback", () => {
+        const cell = { row: { original: { id: 42 } } };
+        const result = cellToAxiosParamsDelete(cell);
+        expect(result).toEqual({
+          url: "/api/helprequest",
+          method: "DELETE",
+          params: { id: 42 },
+        });
+      });
+      test("returns correct axios params with no id at all", () => {
+        const cell = {};
+        const result = cellToAxiosParamsDelete(cell);
+        expect(result).toEqual({
+          url: "/api/helprequest",
+          method: "DELETE",
+          params: { id: undefined },
+        });
+      });
+      test("returns correct axios params when cell itself is undefined", () => {
+        const result = cellToAxiosParamsDelete(undefined);
+        expect(result).toEqual({
+          url: "/api/helprequest",
+          method: "DELETE",
+          params: { id: undefined },
+        });
+      });
+      
     });
   });
   

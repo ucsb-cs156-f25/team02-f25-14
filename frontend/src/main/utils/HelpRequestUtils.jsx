@@ -6,7 +6,8 @@ export function onDeleteSuccess(message) {
 }
 
 export function cellToAxiosParamsDelete(cell) {
-    const id = cell?.row?.original?.id ?? cell?.id;
+    const id = 
+    cell?.row?.original.id ?? cell?.id;
 
   return {
     url: "/api/helprequest",

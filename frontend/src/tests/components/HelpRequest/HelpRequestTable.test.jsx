@@ -207,7 +207,6 @@ describe("HelpRequestTable tests", () => {
     );
     expect(deleteButton).toBeInTheDocument();
   
-    // 🔥 Wrap click in act() and add one event loop tick to flush mutation
     const { act } = await import("react-dom/test-utils");
     await act(async () => {
       fireEvent.click(deleteButton);
@@ -215,7 +214,6 @@ describe("HelpRequestTable tests", () => {
       await new Promise((resolve) => setTimeout(resolve, 0));
     });
   
-    // ✅ wait for the axios mock to record delete
     await waitFor(
       () => expect(axiosMock.history.delete.length).toBeGreaterThan(0),
       { timeout: 5000 },
