@@ -55,7 +55,7 @@ function RecommendationRequestForm({
         </Form.Control.Feedback>
       </Form.Group>
 
-        <Form.Group className="mb-3">
+      <Form.Group className="mb-3">
         <Form.Label htmlFor="professoremail">ProfessorEmail</Form.Label>
         <Form.Control
           data-testid={testIdPrefix + "-professoremail"}
