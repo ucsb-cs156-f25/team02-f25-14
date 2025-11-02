@@ -1,6 +1,6 @@
 import { render, waitFor, fireEvent, screen } from "@testing-library/react";
 import ArticlesForm from "main/components/Articles/ArticlesForm";
-import { restaurantFixtures } from "fixtures/articlesFixtures";
+import { articlesFixtures } from "fixtures/articlesFixtures";
 import { BrowserRouter as Router } from "react-router";
 import { expect } from "vitest";
 
@@ -28,7 +28,7 @@ describe("ArticlesForm tests", () => {
   test("renders correctly when passing in a MenuItemReview", async () => {
     render(
       <Router>
-        <ArticlesForm initialContents={restaurantFixtures.oneRestaurant[0]} />
+  <ArticlesForm initialContents={articlesFixtures.oneRestaurant[0]} />
       </Router>,
     );
     await screen.findByTestId(/ArticlesForm-id/);
