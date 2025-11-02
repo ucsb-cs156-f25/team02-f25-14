@@ -40,8 +40,11 @@ describe("ArticlesTable tests", () => {
   test("Has the expected column headers and content for ordinary user", async () => {
     const currentUser = currentUserFixtures.userOnly;
 
-    const ArticlesModule = await getArticlesModule();
-    const ArticlesTable = ArticlesModule.default;
+  const ArticlesModule = await getArticlesModule();
+  const ArticlesTable = ArticlesModule.default;
+  const { ARTICLES_QUERY_KEY } = ArticlesModule;
+  // ensure the query key constant is correct (kills StringLiteral mutant)
+  expect(ARTICLES_QUERY_KEY).toBe("/api/articles/all");
 
     render(
       <QueryClientProvider client={queryClient}>
@@ -103,8 +106,11 @@ describe("ArticlesTable tests", () => {
   test("Has the expected colum headers and content for adminUser", async () => {
     const currentUser = currentUserFixtures.adminUser;
 
-    const ArticlesModule = await getArticlesModule();
-    const ArticlesTable = ArticlesModule.default;
+  const ArticlesModule = await getArticlesModule();
+  const ArticlesTable = ArticlesModule.default;
+  const { ARTICLES_QUERY_KEY } = ArticlesModule;
+  // ensure the query key constant is correct (kills StringLiteral mutant)
+  expect(ARTICLES_QUERY_KEY).toBe("/api/articles/all");
 
     render(
       <QueryClientProvider client={queryClient}>
