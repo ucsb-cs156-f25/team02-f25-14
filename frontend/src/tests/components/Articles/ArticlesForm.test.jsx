@@ -113,4 +113,43 @@ describe("ArticlesForm tests", () => {
       expect(screen.getByText(/Must be a valid email address/)).toBeInTheDocument();
     });
   });
+
+  test("calls submitAction with correct data when form is valid", async () => {
+    const submitAction = vi.fn();
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <ArticlesForm submitAction={submitAction} />
+        </Router>
+      </QueryClientProvider>,
+    );
+
+    // fill in valid values
+    const titleInput = screen.getByTestId(`${testId}-title`);
+    const urlInput = screen.getByTestId(`${testId}-url`);
+    const explanationInput = screen.getByTestId(`${testId}-explanation`);
+    const emailInput = screen.getByTestId(`${testId}-email`);
+    const dateInput = screen.getByTestId(`${testId}-dateAdded`);
+
+    fireEvent.change(titleInput, { target: { value: "A good title" } });
+    fireEvent.change(urlInput, { target: { value: "https://example.com/article" } });
+    fireEvent.change(explanationInput, { target: { value: "Some explanation" } });
+    fireEvent.change(emailInput, { target: { value: "author@example.com" } });
+    // datetime-local expects YYYY-MM-DDTHH:MM
+    fireEvent.change(dateInput, { target: { value: "2025-11-02T12:34" } });
+
+    const submitButton = screen.getByTestId(`${testId}-submit`);
+    fireEvent.click(submitButton);
+
+    await waitFor(() => expect(submitAction).toHaveBeenCalled());
+
+    // Assert payload contains our values
+    const calledWith = submitAction.mock.calls[0][0];
+    expect(calledWith.title).toBe("A good title");
+    expect(calledWith.url).toBe("https://example.com/article");
+    expect(calledWith.explanation).toBe("Some explanation");
+    expect(calledWith.email).toBe("author@example.com");
+    expect(calledWith.dateAdded).toBe("2025-11-02T12:34");
+  });
 });
