@@ -66,6 +66,7 @@ describe("ArticlesForm tests", () => {
     fireEvent.click(submitButton);
 
     await screen.findByText(/Title is required./);
+    await screen.findByText(/URL is required\./);
     expect(screen.getByText(/email is required./)).toBeInTheDocument();
     expect(screen.getByText(/Explanation is required./)).toBeInTheDocument();
     expect(screen.getByText(/DateAdded is required and must be in ISO format./)).toBeInTheDocument();
@@ -79,6 +80,7 @@ describe("ArticlesForm tests", () => {
     );
     // This test does not apply to ArticlesForm fields; assert presence of title input instead
     await screen.findByTestId("ArticlesForm-title");
+    expect(screen.getByTestId("ArticlesForm-title")).toBeInTheDocument();
   });
 
   test("No Error messsages on good input", async () => {
