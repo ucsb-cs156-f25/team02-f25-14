@@ -1,5 +1,6 @@
 package edu.ucsb.cs156.example.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,7 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity(name = "Articles")
+@Entity(name = "articles")
 public class Articles {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,5 +26,7 @@ public class Articles {
   private String url;
   private String explanation;
   private String email;
-  private LocalDateTime date_added;
+
+  @Column(name = "date_added")
+  private LocalDateTime dateAdded;
 }
