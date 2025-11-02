@@ -28,7 +28,7 @@ describe("ArticlesForm tests", () => {
   test("renders correctly when passing in a MenuItemReview", async () => {
     render(
       <Router>
-  <ArticlesForm initialContents={articlesFixtures.oneRestaurant[0]} />
+        <ArticlesForm initialContents={articlesFixtures.oneRestaurant[0]} />
       </Router>,
     );
     await screen.findByTestId(/ArticlesForm-id/);
@@ -43,15 +43,19 @@ describe("ArticlesForm tests", () => {
       </Router>,
     );
 
-  await screen.findByTestId("ArticlesForm-title");
-  const dateAddedField = screen.getByTestId("ArticlesForm-dateAdded");
-  const submitButton = screen.getByTestId("ArticlesForm-submit");
+    await screen.findByTestId("ArticlesForm-title");
+    const dateAddedField = screen.getByTestId("ArticlesForm-dateAdded");
+    const submitButton = screen.getByTestId("ArticlesForm-submit");
 
-  // invalid date format
-  fireEvent.change(dateAddedField, { target: { value: "bad-date" } });
-  fireEvent.click(submitButton);
+    // invalid date format
+    fireEvent.change(dateAddedField, { target: { value: "bad-date" } });
+    fireEvent.click(submitButton);
 
-  expect(await screen.findByText(/DateAdded is required and must be in ISO format/)).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        /DateAdded is required and must be in ISO format/,
+      ),
+    ).toBeInTheDocument();
   });
 
   test("Correct Error messsages on missing input", async () => {
@@ -69,7 +73,9 @@ describe("ArticlesForm tests", () => {
     await screen.findByText(/URL is required\./);
     expect(screen.getByText(/email is required./)).toBeInTheDocument();
     expect(screen.getByText(/Explanation is required./)).toBeInTheDocument();
-    expect(screen.getByText(/DateAdded is required and must be in ISO format./)).toBeInTheDocument();
+    expect(
+      screen.getByText(/DateAdded is required and must be in ISO format./),
+    ).toBeInTheDocument();
   });
 
   test("Correct Error messsages on stars > 5", async () => {

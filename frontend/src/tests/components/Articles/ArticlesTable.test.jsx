@@ -40,11 +40,11 @@ describe("ArticlesTable tests", () => {
   test("Has the expected column headers and content for ordinary user", async () => {
     const currentUser = currentUserFixtures.userOnly;
 
-  const ArticlesModule = await getArticlesModule();
-  const ArticlesTable = ArticlesModule.default;
-  const { ARTICLES_QUERY_KEY } = ArticlesModule;
-  // ensure the query key constant is correct (kills StringLiteral mutant)
-  expect(ARTICLES_QUERY_KEY).toBe("/api/articles/all");
+    const ArticlesModule = await getArticlesModule();
+    const ArticlesTable = ArticlesModule.default;
+    const { ARTICLES_QUERY_KEY } = ArticlesModule;
+    // ensure the query key constant is correct (kills StringLiteral mutant)
+    expect(ARTICLES_QUERY_KEY).toBe("/api/articles/all");
 
     render(
       <QueryClientProvider client={queryClient}>
@@ -106,11 +106,11 @@ describe("ArticlesTable tests", () => {
   test("Has the expected colum headers and content for adminUser", async () => {
     const currentUser = currentUserFixtures.adminUser;
 
-  const ArticlesModule = await getArticlesModule();
-  const ArticlesTable = ArticlesModule.default;
-  const { ARTICLES_QUERY_KEY } = ArticlesModule;
-  // ensure the query key constant is correct (kills StringLiteral mutant)
-  expect(ARTICLES_QUERY_KEY).toBe("/api/articles/all");
+    const ArticlesModule = await getArticlesModule();
+    const ArticlesTable = ArticlesModule.default;
+    const { ARTICLES_QUERY_KEY } = ArticlesModule;
+    // ensure the query key constant is correct (kills StringLiteral mutant)
+    expect(ARTICLES_QUERY_KEY).toBe("/api/articles/all");
 
     render(
       <QueryClientProvider client={queryClient}>
@@ -194,7 +194,9 @@ describe("ArticlesTable tests", () => {
       ).toHaveTextContent("2");
     });
 
-    const editButton = screen.getByTestId(`ArticlesTable-cell-row-0-col-Edit-button`);
+    const editButton = screen.getByTestId(
+      `ArticlesTable-cell-row-0-col-Edit-button`,
+    );
     expect(editButton).toBeInTheDocument();
 
     fireEvent.click(editButton);
@@ -213,7 +215,9 @@ describe("ArticlesTable tests", () => {
     const { ARTICLES_QUERY_KEY } = ArticlesModule;
 
     const axiosMock = new AxiosMockAdapter(axios);
-    axiosMock.onDelete("/api/articles").reply(200, { message: "Article deleted" });
+    axiosMock
+      .onDelete("/api/articles")
+      .reply(200, { message: "Article deleted" });
 
     // spy on console.log to ensure onDeleteSuccess is called
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
@@ -236,15 +240,19 @@ describe("ArticlesTable tests", () => {
     const callArgs = useBackend.__mockUseBackendMutation.mock.calls[0];
     // deps is the 3rd argument passed to useBackendMutation
     expect(callArgs[2]).toEqual([ARTICLES_QUERY_KEY]);
-  // ensure the query key constant is correct (kills StringLiteral mutant)
-  expect(ARTICLES_QUERY_KEY).toBe("/api/articles/all");
+    // ensure the query key constant is correct (kills StringLiteral mutant)
+    expect(ARTICLES_QUERY_KEY).toBe("/api/articles/all");
 
     // assert - check that the expected content is rendered
     await waitFor(() => {
-      expect(screen.getByTestId(`ArticlesTable-cell-row-0-col-id`)).toHaveTextContent("2");
+      expect(
+        screen.getByTestId(`ArticlesTable-cell-row-0-col-id`),
+      ).toHaveTextContent("2");
     });
 
-    const deleteButton = screen.getByTestId(`ArticlesTable-cell-row-0-col-Delete-button`);
+    const deleteButton = screen.getByTestId(
+      `ArticlesTable-cell-row-0-col-Delete-button`,
+    );
     expect(deleteButton).toBeInTheDocument();
 
     // act - click the delete button

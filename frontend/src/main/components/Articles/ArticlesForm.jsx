@@ -2,7 +2,11 @@ import { Button, Form, Row, Col } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 
-function ArticlesForm({ initialContents, submitAction, buttonLabel = "Create" }) {
+function ArticlesForm({
+  initialContents,
+  submitAction,
+  buttonLabel = "Create",
+}) {
   // Stryker disable all
   const {
     register,
@@ -136,7 +140,8 @@ function ArticlesForm({ initialContents, submitAction, buttonLabel = "Create" })
               })}
             />
             <Form.Control.Feedback type="invalid">
-              {errors.dateAdded && "DateAdded is required and must be in ISO format."}
+              {errors.dateAdded &&
+                "DateAdded is required and must be in ISO format."}
             </Form.Control.Feedback>
           </Form.Group>
         </Col>
