@@ -22,11 +22,17 @@ public class Articles {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
+  @Column(nullable = false)
   private String title;
+
+  @Column(length = 500, nullable = false)
   private String url;
+
+  @Column(columnDefinition = "TEXT")
   private String explanation;
+
   private String email;
 
-  @Column(name = "date_added")
+  @Column(name = "date_added", nullable = false)
   private LocalDateTime dateAdded;
 }
