@@ -20,9 +20,9 @@ describe("ArticlesForm tests", () => {
         <ArticlesForm />
       </Router>,
     );
-    await screen.findByText(/Item ID/);
+    await screen.findByText(/Title/);
     await screen.findByText(/Create/);
-    expect(screen.getByText(/Item ID/)).toBeInTheDocument();
+    expect(screen.getByText(/Title/)).toBeInTheDocument();
   });
 
   test("renders correctly when passing in a MenuItemReview", async () => {
