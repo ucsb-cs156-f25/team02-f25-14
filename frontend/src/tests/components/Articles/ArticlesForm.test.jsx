@@ -114,6 +114,32 @@ describe("ArticlesForm tests", () => {
     });
   });
 
+  test("shows title max length and url pattern errors", async () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <ArticlesForm />
+        </Router>
+      </QueryClientProvider>,
+    );
+
+    const titleInput = screen.getByTestId(`${testId}-title`);
+    const urlInput = screen.getByTestId(`${testId}-url`);
+    const submitButton = screen.getByTestId(`${testId}-submit`);
+
+    // exceed title max length
+    fireEvent.change(titleInput, { target: { value: "a".repeat(201) } });
+    // invalid url that doesn't start with http/https
+    fireEvent.change(urlInput, { target: { value: "ftp://example.com" } });
+
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Max length 200 characters/)).toBeInTheDocument();
+      expect(screen.getByText(/URL must start with http:\/\/ or https:\/\//)).toBeInTheDocument();
+    });
+  });
+
   test("calls submitAction with correct data when form is valid", async () => {
     const submitAction = vi.fn();
 
