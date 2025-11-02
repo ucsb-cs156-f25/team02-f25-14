@@ -1,6 +1,7 @@
 import { fireEvent, render, waitFor, screen } from "@testing-library/react";
 import { articlesFixtures } from "fixtures/articlesFixtures";
-import ArticlesTable from "main/components/Articles/ArticlesTable";
+
+// We'll dynamically import the Articles module after we set up mocks/spies
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router";
 import { currentUserFixtures } from "fixtures/currentUserFixtures";
@@ -16,11 +17,31 @@ vi.mock("react-router", async () => {
   };
 });
 
+// Mock the useBackend module so we can spy on useBackendMutation's arguments
+vi.mock("main/utils/useBackend", async () => {
+  const actual = await vi.importActual("main/utils/useBackend");
+  const mockUseBackendMutation = vi.fn((...args) => {
+    return actual.useBackendMutation(...args);
+  });
+  return {
+    ...actual,
+    useBackendMutation: mockUseBackendMutation,
+    __mockUseBackendMutation: mockUseBackendMutation,
+  };
+});
+
+const getArticlesModule = async () => {
+  return await import("main/components/Articles/ArticlesTable");
+};
+
 describe("ArticlesTable tests", () => {
   const queryClient = new QueryClient();
 
-  test("Has the expected column headers and content for ordinary user", () => {
+  test("Has the expected column headers and content for ordinary user", async () => {
     const currentUser = currentUserFixtures.userOnly;
+
+    const ArticlesModule = await getArticlesModule();
+    const ArticlesTable = ArticlesModule.default;
 
     render(
       <QueryClientProvider client={queryClient}>
@@ -79,8 +100,11 @@ describe("ArticlesTable tests", () => {
     expect(deleteButton).not.toBeInTheDocument();
   });
 
-  test("Has the expected colum headers and content for adminUser", () => {
+  test("Has the expected colum headers and content for adminUser", async () => {
     const currentUser = currentUserFixtures.adminUser;
+
+    const ArticlesModule = await getArticlesModule();
+    const ArticlesTable = ArticlesModule.default;
 
     render(
       <QueryClientProvider client={queryClient}>
@@ -144,6 +168,9 @@ describe("ArticlesTable tests", () => {
   test("Edit button navigates to the edit page for admin user", async () => {
     const currentUser = currentUserFixtures.adminUser;
 
+    const ArticlesModule = await getArticlesModule();
+    const ArticlesTable = ArticlesModule.default;
+
     render(
       <QueryClientProvider client={queryClient}>
         <MemoryRouter>
@@ -175,8 +202,15 @@ describe("ArticlesTable tests", () => {
     // arrange
     const currentUser = currentUserFixtures.adminUser;
 
+    const ArticlesModule = await getArticlesModule();
+    const ArticlesTable = ArticlesModule.default;
+    const { ARTICLES_QUERY_KEY } = ArticlesModule;
+
     const axiosMock = new AxiosMockAdapter(axios);
     axiosMock.onDelete("/api/articles").reply(200, { message: "Article deleted" });
+
+    // spy on console.log to ensure onDeleteSuccess is called
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
     // act - render the component
     render(
@@ -189,6 +223,15 @@ describe("ArticlesTable tests", () => {
         </MemoryRouter>
       </QueryClientProvider>,
     );
+
+    // ensure useBackendMutation was called with the expected dependency array
+    const useBackend = await import("main/utils/useBackend");
+    expect(useBackend.__mockUseBackendMutation).toHaveBeenCalled();
+    const callArgs = useBackend.__mockUseBackendMutation.mock.calls[0];
+    // deps is the 3rd argument passed to useBackendMutation
+    expect(callArgs[2]).toEqual([ARTICLES_QUERY_KEY]);
+  // ensure the query key constant is correct (kills StringLiteral mutant)
+  expect(ARTICLES_QUERY_KEY).toBe("/api/articles/all");
 
     // assert - check that the expected content is rendered
     await waitFor(() => {
@@ -204,5 +247,11 @@ describe("ArticlesTable tests", () => {
     // assert - check that the delete endpoint was called
     await waitFor(() => expect(axiosMock.history.delete.length).toBe(1));
     expect(axiosMock.history.delete[0].params).toEqual({ id: 2 });
+
+    // ensure the query key constant is correct (kills StringLiteral/ArrayDeclaration mutants)
+    expect(ARTICLES_QUERY_KEY).toBe("/api/articles/all");
+    // ensure onDeleteSuccess logged the message (kills ObjectLiteral mutant)
+    await waitFor(() => expect(logSpy).toHaveBeenCalled());
+    logSpy.mockRestore();
   });
 });

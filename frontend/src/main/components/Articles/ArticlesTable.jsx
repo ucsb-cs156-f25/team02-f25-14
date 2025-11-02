@@ -6,6 +6,8 @@ import { cellToAxiosParamsDelete, onDeleteSuccess } from "main/utils/ArticlesUti
 import { useNavigate } from "react-router";
 import { hasRole } from "main/utils/useCurrentUser";
 
+export const ARTICLES_QUERY_KEY = "/api/articles/all";
+
 export default function ArticlesTable({
   articles,
   currentUser,
@@ -20,7 +22,7 @@ export default function ArticlesTable({
   const deleteMutation = useBackendMutation(
     cellToAxiosParamsDelete,
     { onSuccess: onDeleteSuccess },
-    ["/api/articles/all"],
+    [ARTICLES_QUERY_KEY],
   );
 
   const deleteCallback = async (cell) => {
