@@ -79,7 +79,7 @@ public class ArticlesControllerTests extends ControllerTestCase {
             .url("https://www.google.com")
             .explanation("This is a test explanation")
             .email("article1@test.com")
-            .dateAdded(ldt1)
+            .date_added(ldt1)
             .build();
 
     LocalDateTime ldt2 = LocalDateTime.parse("2022-03-11T00:00:00");
@@ -89,7 +89,7 @@ public class ArticlesControllerTests extends ControllerTestCase {
             .url("https://www.google.com")
             .explanation("This is a test explanation")
             .email("article2@test.com")
-            .dateAdded(ldt2)
+            .date_added(ldt2)
             .build();
 
     ArrayList<Articles> expectedArticles = new ArrayList<>(Arrays.asList(article1, article2));
@@ -118,7 +118,7 @@ public class ArticlesControllerTests extends ControllerTestCase {
     MvcResult response =
         mockMvc
             .perform(
-                post("/api/articles/post?title=Article1&url=https://www.google.com&explanation=test&email=article1@test.com&dateAdded=2022-01-03T00:00:00")
+                post("/api/articles/post?title=Article1&url=https://www.google.com&explanation=test&email=article1@test.com&date_added=2022-01-03T00:00:00")
                     .with(csrf()))
             .andExpect(status().isOk())
             .andReturn();
@@ -132,7 +132,7 @@ public class ArticlesControllerTests extends ControllerTestCase {
     assertEquals("https://www.google.com", saved.getUrl());
     assertEquals("test", saved.getExplanation());
     assertEquals("article1@test.com", saved.getEmail());
-    assertEquals(ldt1, saved.getDateAdded());
+    assertEquals(ldt1, saved.getdate_added());
 
     // Response echoes saved entity
     String expectedJson = mapper.writeValueAsString(saved);
@@ -157,7 +157,7 @@ public class ArticlesControllerTests extends ControllerTestCase {
             .url("https://example.com")
             .explanation("Test explanation")
             .email("test@ucsb.edu")
-            .dateAdded(ldt)
+            .date_added(ldt)
             .build();
 
     when(articlesRepository.findById(eq(7L))).thenReturn(Optional.of(article));
@@ -199,7 +199,7 @@ public class ArticlesControllerTests extends ControllerTestCase {
             .url("https://example.com")
             .explanation("Test explanation")
             .email("test@ucsb.edu")
-            .dateAdded(ldt1)
+            .date_added(ldt1)
             .build();
 
     // client payload
@@ -209,7 +209,7 @@ public class ArticlesControllerTests extends ControllerTestCase {
             .url("https://example2.com")
             .explanation("Second explanation")
             .email("test2@ucsb.edu")
-            .dateAdded(ldt2)
+            .date_added(ldt2)
             .build();
 
     String requestBody = mapper.writeValueAsString(articlesEdited);
@@ -238,7 +238,7 @@ public class ArticlesControllerTests extends ControllerTestCase {
     assertEquals("https://example2.com", saved.getUrl());
     assertEquals("Second explanation", saved.getExplanation());
     assertEquals("test2@ucsb.edu", saved.getEmail());
-    assertEquals(ldt2, saved.getDateAdded());
+    assertEquals(ldt2, saved.getdate_added());
 
     String responseString = response.getResponse().getContentAsString();
     assertEquals(mapper.writeValueAsString(saved), responseString);
@@ -255,7 +255,7 @@ public class ArticlesControllerTests extends ControllerTestCase {
             .url("https://example.com")
             .explanation("Test explanation")
             .email("test@ucsb.edu")
-            .dateAdded(ldt1)
+            .date_added(ldt1)
             .build();
 
     String requestBody = mapper.writeValueAsString(articlesEdited);
@@ -291,7 +291,7 @@ public class ArticlesControllerTests extends ControllerTestCase {
             .url("https://example.com")
             .explanation("Test explanation")
             .email("test@ucsb.edu")
-            .dateAdded(ldt1)
+            .date_added(ldt1)
             .build();
 
     when(articlesRepository.findById(eq(15L))).thenReturn(Optional.of(article1));

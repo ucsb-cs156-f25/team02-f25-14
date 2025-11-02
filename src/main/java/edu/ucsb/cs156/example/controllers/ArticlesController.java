@@ -51,7 +51,7 @@ public class ArticlesController extends ApiController {
    * @param url the url of the article
    * @param explanation the explanation of the article
    * @param email the email of the user who added the article
-   * @param dateAdded the date the article was added
+   * @param date_added the date the article was added
    * @return the saved article
    */
   @Operation(summary = "Create a new article")
@@ -63,24 +63,24 @@ public class ArticlesController extends ApiController {
       @Parameter(name = "explanation") @RequestParam String explanation,
       @Parameter(name = "email") @RequestParam String email,
       @Parameter(
-              name = "dateAdded",
+              name = "date_added",
               description =
                   "date (in iso format, e.g. YYYY-mm-ddTHH:MM:SS; see https://en.wikipedia.org/wiki/ISO_8601)")
-          @RequestParam("dateAdded")
+          @RequestParam("date_added")
           @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-          LocalDateTime dateAdded)
+          LocalDateTime date_added)
       throws JsonProcessingException {
 
     // For an explanation of @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     // See: https://www.baeldung.com/spring-date-parameters
-    log.info("dateAdded={}", dateAdded);
+    log.info("date_added={}", date_added);
 
     Articles article = new Articles();
     article.setTitle(title);
     article.setUrl(url);
     article.setExplanation(explanation);
     article.setEmail(email);
-    article.setDateAdded(dateAdded);
+    article.setdate_added(date_added);
 
     return articlesRepository.save(article);
   }
@@ -116,7 +116,7 @@ public class ArticlesController extends ApiController {
     articles.setUrl(incoming.getUrl());
     articles.setExplanation(incoming.getExplanation());
     articles.setEmail(incoming.getEmail());
-    articles.setDateAdded(incoming.getDateAdded());
+    articles.setdate_added(incoming.getdate_added());
 
     return articlesRepository.save(articles);
   }
