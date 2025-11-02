@@ -7,14 +7,14 @@ function RecommendationRequestForm({
   submitAction,
   buttonLabel = "Create",
 }) {
-  const defaultValues = initialContents ? { initialContents } : {};
+  
 
   // Stryker disable all
   const {
     register,
     formState: { errors },
     handleSubmit,
-  } = useForm({ defaultValues });
+  } = useForm({ defaultValues: initialContents || {} });
   // Stryker restore all
 
   const navigate = useNavigate();
@@ -45,7 +45,7 @@ function RecommendationRequestForm({
       <Form.Group className="mb-3">
         <Form.Label htmlFor="requesteremail">RequesterEmail</Form.Label>
         <Form.Control
-          data-testid={testIdPrefix + "-requesteremail"}
+
           id="requesteremail"
           type="text"
           isInvalid={Boolean(errors.requesteremail)}
@@ -61,7 +61,7 @@ function RecommendationRequestForm({
       <Form.Group className="mb-3">
         <Form.Label htmlFor="professoremail">ProfessorEmail</Form.Label>
         <Form.Control
-          data-testid={testIdPrefix + "-professoremail"}
+
           id="professoremail"
           type="text"
           isInvalid={Boolean(errors.professoremail)}
@@ -77,7 +77,7 @@ function RecommendationRequestForm({
       <Form.Group className="mb-3">
         <Form.Label htmlFor="explanation">Explanation</Form.Label>
         <Form.Control
-          data-testid={testIdPrefix + "-explanation"}
+
           id="explanation"
           type="text"
           isInvalid={Boolean(errors.explanation)}
@@ -95,7 +95,7 @@ function RecommendationRequestForm({
           DateRequested (iso format)
         </Form.Label>
         <Form.Control
-          data-testid="-dateRequested"
+
           id="dateRequested"
           type="datetime-local"
           isInvalid={Boolean(errors.dateRequested)}
@@ -112,7 +112,7 @@ function RecommendationRequestForm({
       <Form.Group className="mb-3">
         <Form.Label htmlFor="dateNeeded">DateNeeded (iso format)</Form.Label>
         <Form.Control
-          data-testid="-dateNeeded"
+
           id="dateNeeded"
           type="datetime-local"
           isInvalid={Boolean(errors.dateRequested)}
@@ -129,7 +129,7 @@ function RecommendationRequestForm({
       <Form.Group className="mb-3">
         <Form.Label htmlFor="done">Done?</Form.Label>
         <Form.Check
-          data-testid={testIdPrefix + "-done"}
+
           id="done"
           type="checkbox"
           label="Done"
@@ -143,7 +143,7 @@ function RecommendationRequestForm({
         </Form.Control.Feedback>
       </Form.Group>
 
-      <Button type="submit" data-testid={testIdPrefix + "-submit"}>
+      <Button type="submit">
         {buttonLabel}
       </Button>
       <Button
