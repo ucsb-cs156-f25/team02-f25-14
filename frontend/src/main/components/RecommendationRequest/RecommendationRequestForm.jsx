@@ -7,18 +7,14 @@ function RecommendationRequestForm({
   submitAction,
   buttonLabel = "Create",
 }) {
+  const defaultValues = initialContents ? { initialContents } : {};
+
   // Stryker disable all
   const {
     register,
     formState: { errors },
     handleSubmit,
-  } = useForm({
-    defaultValues:
-      {
-        ...initialContents,
-        dateRequested: initialContents?.dateRequested?.replace("Z", ""),
-      } || {},
-  });
+  } = useForm({ defaultValues });
   // Stryker restore all
 
   const navigate = useNavigate();
@@ -55,10 +51,6 @@ function RecommendationRequestForm({
           isInvalid={Boolean(errors.requesteremail)}
           {...register("requesteremail", {
             required: "Requester email is required.",
-            maxLength: {
-              value: 30,
-              message: "Max length 30 characters",
-            },
           })}
         />
         <Form.Control.Feedback type="invalid">
@@ -75,10 +67,6 @@ function RecommendationRequestForm({
           isInvalid={Boolean(errors.professoremail)}
           {...register("professoremail", {
             required: "Professor email is required.",
-            maxLength: {
-              value: 30,
-              message: "Max length 30 characters",
-            },
           })}
         />
         <Form.Control.Feedback type="invalid">
@@ -139,7 +127,7 @@ function RecommendationRequestForm({
       </Form.Group>
 
       <Form.Group className="mb-3">
-        <Form.Label htmlFor="done">Done</Form.Label>
+        <Form.Label htmlFor="done">Done?</Form.Label>
         <Form.Check
           data-testid={testIdPrefix + "-done"}
           id="done"
@@ -147,7 +135,7 @@ function RecommendationRequestForm({
           label="Done"
           isInvalid={Boolean(errors.done)}
           {...register("done", {
-            required: "Done is required.",
+            required: "This is required.",
           })}
         />
         <Form.Control.Feedback type="invalid">
