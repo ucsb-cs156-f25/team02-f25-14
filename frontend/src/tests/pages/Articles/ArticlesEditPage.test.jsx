@@ -144,6 +144,7 @@ describe("ArticlesIndexPage tests", () => {
   test("delete failure does NOT show success toast (admin)", async () => {
     setupAdminUser();
     const queryClient = new QueryClient();
+    // Mock GET requests for both initial load and refetch after delete failure
     axiosMock.onGet("/api/articles/all").reply(200, articlesFixtures.threeRestaurants);
     axiosMock.onDelete("/api/articles").reply(500);
 
@@ -162,6 +163,11 @@ describe("ArticlesIndexPage tests", () => {
     fireEvent.click(screen.getByTestId(`${testId}-cell-row-0-col-Delete-button`));
 
     await waitFor(() => expect(axiosMock.history.delete.length).toBe(1));
-    expect(mockToast).not.toHaveBeenCalledWith("Articles with id 2 deleted");
+    
+    // Wait a bit to allow any async operations (refetch, error handling) to complete
+    await waitFor(() => {
+      // The key assertion: success toast should NOT be shown
+      expect(mockToast).not.toHaveBeenCalledWith("Articles with id 2 deleted");
+    }, { timeout: 3000 });
   });
 });
