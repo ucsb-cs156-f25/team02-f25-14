@@ -1,61 +1,42 @@
 import { toast } from "react-toastify";
 
 const normalizeDateAdded = (dateAdded) => {
-  if (!dateAdded) {
-    return dateAdded;
+  let normalized = dateAdded;
+  if (normalized && !normalized.includes(":")) {
+    normalized = `${normalized}T00:00:00`;
+  } else if (normalized && normalized.match(/T\d{2}:\d{2}$/)) {
+    normalized = `${normalized}:00`;
   }
-
-  if (!dateAdded.includes(":")) {
-    return `${dateAdded}T00:00:00`;
-  }
-
-  if (/T\d{2}:\d{2}$/.test(dateAdded)) {
-    return `${dateAdded}:00`;
-  }
-
-  return dateAdded;
+  return normalized;
 };
 
-export function articleToCreateParams({
-  title,
-  url,
-  explanation,
-  email,
-  dateAdded,
-}) {
+export function articleToCreateParams(article) {
   return {
     url: "/api/articles/post",
     method: "POST",
     params: {
-      title,
-      url,
-      explanation,
-      email,
-      dateAdded: normalizeDateAdded(dateAdded),
+      title: article.title,
+      url: article.url,
+      explanation: article.explanation,
+      email: article.email,
+      dateAdded: normalizeDateAdded(article.dateAdded),
     },
   };
 }
 
-export function articleToPutParams({
-  id,
-  title,
-  url,
-  explanation,
-  email,
-  dateAdded,
-}) {
+export function articleToPutParams(article) {
   return {
     url: "/api/articles",
     method: "PUT",
     params: {
-      id,
+      id: article.id,
     },
     data: {
-      title,
-      url,
-      explanation,
-      email,
-      dateAdded: normalizeDateAdded(dateAdded),
+      title: article.title,
+      url: article.url,
+      explanation: article.explanation,
+      email: article.email,
+      dateAdded: normalizeDateAdded(article.dateAdded),
     },
   };
 }
