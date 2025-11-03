@@ -226,6 +226,14 @@ describe("ArticlesEditPage tests", () => {
         email: "test@example.com",
         dateAdded: "2022-01-02T00:00:00",
       });
+      axiosMock.onPut("/api/articles").reply(200, {
+        id: "17",
+        title: "Test Article",
+        url: "https://example.com",
+        explanation: "This is a test article",
+        email: "test@example.com",
+        dateAdded: "2022-01-03T00:00:00",
+      });
 
       render(
         <QueryClientProvider client={queryClient}>
