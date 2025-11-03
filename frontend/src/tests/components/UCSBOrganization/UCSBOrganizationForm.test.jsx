@@ -113,4 +113,21 @@ describe("UCSBOrganizationForm tests", () => {
       expect(screen.getByText(/Max length 255 characters/)).toBeInTheDocument();
     });
   });
+
+  test("Inactive select shows required validation", async () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <UCSBOrganizationForm />
+        </Router>
+      </QueryClientProvider>
+    );
+  
+    const submitButton = screen.getByText(/Create/);
+    fireEvent.click(submitButton);
+  
+    await waitFor(() => {
+      expect(screen.getByText(/Inactive is required/i)).toBeInTheDocument();
+    });
+  });
 });
