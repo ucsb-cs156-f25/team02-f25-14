@@ -87,6 +87,20 @@ describe("ArticlesUtils", () => {
 
       expect(result.params.dateAdded).toBe("2023-11-10T09:30:00");
     });
+
+    test("leaves date unchanged when seconds present", () => {
+      const article = {
+        title: "Title",
+        url: "https://example.com",
+        explanation: "Explain",
+        email: "user@example.com",
+        dateAdded: "2023-11-10T09:30:45",
+      };
+
+      const result = articleToCreateParams(article);
+
+      expect(result.params.dateAdded).toBe("2023-11-10T09:30:45");
+    });
   });
 
   describe("articleToPutParams", () => {
@@ -112,6 +126,21 @@ describe("ArticlesUtils", () => {
           }),
         }),
       );
+    });
+
+    test("preserves seconds when already present", () => {
+      const article = {
+        id: 8,
+        title: "Title",
+        url: "https://example.com",
+        explanation: "Explain",
+        email: "user@example.com",
+        dateAdded: "2023-11-10T09:30:45",
+      };
+
+      const result = articleToPutParams(article);
+
+      expect(result.data.dateAdded).toBe("2023-11-10T09:30:45");
     });
   });
 });
