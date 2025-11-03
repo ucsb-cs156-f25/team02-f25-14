@@ -28,7 +28,7 @@ describe("ArticlesForm tests", () => {
   test("renders correctly when passing in a MenuItemReview", async () => {
     render(
       <Router>
-        <ArticlesForm initialContents={articlesFixtures.oneRestaurant[0]} />
+        <ArticlesForm initialContents={articlesFixtures.oneArticle[0]} />
       </Router>,
     );
     await screen.findByTestId(/ArticlesForm-id/);

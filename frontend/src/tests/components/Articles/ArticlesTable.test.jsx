@@ -50,7 +50,7 @@ describe("ArticlesTable tests", () => {
       <QueryClientProvider client={queryClient}>
         <MemoryRouter>
           <ArticlesTable
-            articles={articlesFixtures.threeRestaurants}
+            articles={articlesFixtures.threeArticles}
             currentUser={currentUser}
           />
         </MemoryRouter>
@@ -116,7 +116,7 @@ describe("ArticlesTable tests", () => {
       <QueryClientProvider client={queryClient}>
         <MemoryRouter>
           <ArticlesTable
-            articles={articlesFixtures.threeRestaurants}
+            articles={articlesFixtures.threeArticles}
             currentUser={currentUser}
           />
         </MemoryRouter>
@@ -181,7 +181,7 @@ describe("ArticlesTable tests", () => {
       <QueryClientProvider client={queryClient}>
         <MemoryRouter>
           <ArticlesTable
-            articles={articlesFixtures.threeRestaurants}
+            articles={articlesFixtures.threeArticles}
             currentUser={currentUser}
           />
         </MemoryRouter>
@@ -227,7 +227,7 @@ describe("ArticlesTable tests", () => {
       <QueryClientProvider client={queryClient}>
         <MemoryRouter>
           <ArticlesTable
-            articles={articlesFixtures.threeRestaurants}
+            articles={articlesFixtures.threeArticles}
             currentUser={currentUser}
           />
         </MemoryRouter>

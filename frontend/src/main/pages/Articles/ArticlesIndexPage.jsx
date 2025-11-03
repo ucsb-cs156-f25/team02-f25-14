@@ -2,20 +2,18 @@ import React from "react";
 import { useBackend } from "main/utils/useBackend";
 
 import BasicLayout from "main/layouts/BasicLayout/BasicLayout";
-import ArticlesTable from "main/components/Articles/ArticlesTable";
+import ArticlesTable, {
+  ARTICLES_QUERY_KEY,
+} from "main/components/Articles/ArticlesTable";
 import { useCurrentUser, hasRole } from "main/utils/useCurrentUser";
 import { Button } from "react-bootstrap";
 
 export default function ArticlesIndexPage() {
   const currentUser = useCurrentUser();
 
-  const {
-    data: articles,
-    error: _error,
-    status: _status,
-  } = useBackend(
+  const { data: articles } = useBackend(
     // Stryker disable next-line all : don't test internal caching of React Query
-    ["/api/articles/all"],
+    [ARTICLES_QUERY_KEY],
     { method: "GET", url: "/api/articles/all" },
     // Stryker disable next-line all : don't test default value of empty list
     [],
