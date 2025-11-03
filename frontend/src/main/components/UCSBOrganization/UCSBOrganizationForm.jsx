@@ -30,10 +30,6 @@ function UCSBOrganizationForm({
           isInvalid={Boolean(errors.orgCode)}
           {...register("orgCode", {
             required: "orgCode is required.",
-            maxLength: {
-              value: 10,
-              message: "Max Length 10 characters",
-            },
           })}
         />
         <Form.Control.Feedback type="invalid">
@@ -51,7 +47,7 @@ function UCSBOrganizationForm({
           type="text"
           isInvalid={Boolean(errors.orgTranslationShort)}
           {...register("orgTranslationShort", {
-            required: "orgTranslation Short is required.",
+            required: "orgTranslationShort is required.",
             maxLength: {
               value: 255,
               message: "Max length 255 characters",
@@ -71,7 +67,7 @@ function UCSBOrganizationForm({
           type="text"
           isInvalid={Boolean(errors.orgTranslation)}
           {...register("orgTranslation", {
-            required: "Org Translation is required.",
+            required: "orgTranslation is required.",
           })}
         />
         <Form.Control.Feedback type="invalid">
@@ -84,13 +80,19 @@ function UCSBOrganizationForm({
         <Form.Select
           id="inactive"
           data-testid={testIdPrefix + "-inactive"}
+          isInvalid={Boolean(errors.inactive)}
           {...register("inactive", {
-            setValueAs: (value) => value === "true", // convert string to boolean
+            required: "Inactive is required.",
+            setValueAs: (value) => value === "true",
           })}
         >
+          <option value="">Select true/false</option>
           <option value="false">false</option>
           <option value="true">true</option>
         </Form.Select>
+        <Form.Control.Feedback type="invalid">
+          {errors.inactive?.message}
+        </Form.Control.Feedback>
       </Form.Group>
 
       <Button type="submit" data-testid={testIdPrefix + "-submit"}>
