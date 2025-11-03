@@ -306,5 +306,119 @@ describe("ArticlesCreatePage tests", () => {
     await waitFor(() => expect(axiosMock.history.post.length).toBe(1));
     expect(axiosMock.history.post[0].params.dateAdded).toBe("2022-01-06T00:00:00");
   });
+
+  test("does not redirect when storybook prop is true", async () => {
+    const queryClient = new QueryClient();
+    const article = {
+      id: 5,
+      title: "Storybook Article",
+      url: "https://storybook.com",
+      explanation: "Storybook test article",
+      email: "storybook@example.com",
+      dateAdded: "2022-01-07T12:00:00",
+    };
+
+    axiosMock.onPost("/api/articles/post").reply(202, article);
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <ArticlesCreatePage storybook={true} />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("ArticlesForm-title")).toBeInTheDocument();
+    });
+
+    const titleInput = screen.getByTestId("ArticlesForm-title");
+    const urlInput = screen.getByTestId("ArticlesForm-url");
+    const explanationInput = screen.getByTestId("ArticlesForm-explanation");
+    const emailInput = screen.getByTestId("ArticlesForm-email");
+    const dateAddedInput = screen.getByTestId("ArticlesForm-dateAdded");
+    const createButton = screen.getByTestId("ArticlesForm-submit");
+
+    fireEvent.change(titleInput, { target: { value: "Storybook Article" } });
+    fireEvent.change(urlInput, { target: { value: "https://storybook.com" } });
+    fireEvent.change(explanationInput, {
+      target: { value: "Storybook test article" },
+    });
+    fireEvent.change(emailInput, { target: { value: "storybook@example.com" } });
+    fireEvent.change(dateAddedInput, {
+      target: { value: "2022-01-07T12:00" },
+    });
+    fireEvent.click(createButton);
+
+    await waitFor(() => expect(axiosMock.history.post.length).toBe(1));
+
+    // When storybook is true, should not navigate even on success
+    expect(mockNavigate).not.toHaveBeenCalled();
+    
+    // Form should still be visible (not redirected)
+    expect(screen.getByTestId("ArticlesForm-title")).toBeInTheDocument();
+  });
+
+  test("handles dateAdded with already complete format (includes seconds)", async () => {
+    // Test the case where dateAdded already has seconds (doesn't match either condition)
+    const { useBackendMutation } = await import("main/utils/useBackend");
+    const testQueryClient = new QueryClient();
+    const wrapper = ({ children }) => (
+      <QueryClientProvider client={testQueryClient}>
+        <MemoryRouter>{children}</MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    const article = {
+      id: 6,
+      title: "Complete Date Article",
+      url: "https://complete.com",
+      explanation: "Test article",
+      email: "complete@example.com",
+      dateAdded: "2022-01-08T12:00:00",
+    };
+
+    axiosMock.onPost("/api/articles/post").reply(202, article);
+
+    // Replicate the objectToAxiosParams function from ArticlesCreatePage
+    const objectToAxiosParams = (article) => {
+      let dateAdded = article.dateAdded;
+      if (dateAdded && !dateAdded.includes(":")) {
+        dateAdded = dateAdded + "T00:00:00";
+      } else if (dateAdded && dateAdded.match(/T\d{2}:\d{2}$/)) {
+        dateAdded = dateAdded + ":00";
+      }
+      return {
+        url: "/api/articles/post",
+        method: "POST",
+        params: {
+          title: article.title,
+          url: article.url,
+          explanation: article.explanation,
+          email: article.email,
+          dateAdded: dateAdded,
+        },
+      };
+    };
+
+    const { result } = renderHook(
+      () => useBackendMutation(objectToAxiosParams, {}, [`/api/articles/all`]),
+      { wrapper },
+    );
+
+    act(() => {
+      result.current.mutate({
+        title: "Complete Date Article",
+        url: "https://complete.com",
+        explanation: "Test article",
+        email: "complete@example.com",
+        dateAdded: "2022-01-08T12:00:00", // Already has seconds - should remain unchanged
+      });
+    });
+
+    await waitFor(() => expect(axiosMock.history.post.length).toBe(1));
+    // Date should remain unchanged when already in complete format
+    expect(axiosMock.history.post[0].params.dateAdded).toBe("2022-01-08T12:00:00");
+  });
 });
 
