@@ -21,19 +21,25 @@ function UCSBOrganizationForm({
 
   return (
     <Form onSubmit={handleSubmit(submitAction)}>
-      {initialContents && (
-        <Form.Group className="mb-3">
-          <Form.Label htmlFor="orgCode">orgCode</Form.Label>
-          <Form.Control
-            data-testid={testIdPrefix + "-orgCode"}
-            id="orgCode"
-            type="text"
-            {...register("orgCode")}
-            value={initialContents.id}
-            disabled
-          />
-        </Form.Group>
-      )}
+      <Form.Group className="mb-3">
+        <Form.Label htmlFor="orgCode">orgCode</Form.Label>
+        <Form.Control
+          data-testid={testIdPrefix + "-orgCode"}
+          id="orgCode"
+          type="text"
+          isInvalid={Boolean(errors.orgCode)}
+          {...register("orgCode", {
+            required: "orgCode is required.",
+            maxLength: {
+              value: 10,
+              message: "Max Length 10 characters",
+            },
+          })}
+        />
+        <Form.Control.Feedback type="invalid">
+          {errors.orgCode?.message}
+        </Form.Control.Feedback>
+      </Form.Group>
 
       <Form.Group className="mb-3">
         <Form.Label htmlFor="orgTranslationShort">
@@ -45,7 +51,7 @@ function UCSBOrganizationForm({
           type="text"
           isInvalid={Boolean(errors.orgTranslationShort)}
           {...register("orgTranslationShort", {
-            required: "orgTranslationShort is required.",
+            required: "orgTranslation Short is required.",
             maxLength: {
               value: 255,
               message: "Max length 255 characters",
@@ -53,7 +59,7 @@ function UCSBOrganizationForm({
           })}
         />
         <Form.Control.Feedback type="invalid">
-          {errors.name?.message}
+          {errors.orgTranslationShort?.message}
         </Form.Control.Feedback>
       </Form.Group>
 
@@ -65,12 +71,26 @@ function UCSBOrganizationForm({
           type="text"
           isInvalid={Boolean(errors.orgTranslation)}
           {...register("orgTranslation", {
-            required: "orgTranslation is required.",
+            required: "Org Translation is required.",
           })}
         />
         <Form.Control.Feedback type="invalid">
-          {errors.description?.message}
+          {errors.orgTranslation?.message}
         </Form.Control.Feedback>
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label htmlFor="inactive">Inactive</Form.Label>
+        <Form.Select
+          id="inactive"
+          data-testid={testIdPrefix + "-inactive"}
+          {...register("inactive", {
+            setValueAs: (value) => value === "true", // convert string to boolean
+          })}
+        >
+          <option value="false">false</option>
+          <option value="true">true</option>
+        </Form.Select>
       </Form.Group>
 
       <Button type="submit" data-testid={testIdPrefix + "-submit"}>
