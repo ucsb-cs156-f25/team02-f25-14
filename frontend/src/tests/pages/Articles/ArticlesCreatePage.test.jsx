@@ -110,7 +110,7 @@ describe("ArticlesCreatePage tests", () => {
     });
     fireEvent.change(emailInput, { target: { value: "test@example.com" } });
     fireEvent.change(dateAddedInput, {
-      target: { value: "2022-01-02T12:00:00" },
+      target: { value: "2022-01-02T12:00" },
     });
     fireEvent.click(createButton);
 

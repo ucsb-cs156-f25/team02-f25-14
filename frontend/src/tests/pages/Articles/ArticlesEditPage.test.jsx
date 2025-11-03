@@ -1,48 +1,220 @@
-import { render, screen } from "@testing-library/react";
-import ArticlesEditPage from "main/pages/Articles/ArticlesEditPage";
+import { fireEvent, render, waitFor, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router";
+import ArticlesEditPage from "main/pages/Articles/ArticlesEditPage";
 
 import { apiCurrentUserFixtures } from "fixtures/currentUserFixtures";
 import { systemInfoFixtures } from "fixtures/systemInfoFixtures";
 import axios from "axios";
 import AxiosMockAdapter from "axios-mock-adapter";
-import { expect } from "vitest";
+import mockConsole from "tests/testutils/mockConsole";
 
-describe("ArticlesEditPage tests", () => {
-  const axiosMock = new AxiosMockAdapter(axios);
-
-  const setupUserOnly = () => {
-    axiosMock.reset();
-    axiosMock.resetHistory();
-    axiosMock
-      .onGet("/api/currentUser")
-      .reply(200, apiCurrentUserFixtures.userOnly);
-    axiosMock
-      .onGet("/api/systemInfo")
-      .reply(200, systemInfoFixtures.showingNeither);
+const mockToast = vi.fn();
+vi.mock("react-toastify", async (importOriginal) => {
+  const originalModule = await importOriginal();
+  return {
+    ...originalModule,
+    toast: vi.fn((x) => mockToast(x)),
   };
-
-  const queryClient = new QueryClient();
-  test("Renders expected content", async () => {
-    // arrange
-
-    setupUserOnly();
-
-    // act
-    render(
-      <QueryClientProvider client={queryClient}>
-        <MemoryRouter>
-          <ArticlesEditPage />
-        </MemoryRouter>
-      </QueryClientProvider>,
-    );
-
-    // assert
-    await screen.findByText("Edit page not yet implemented");
-    expect(
-      screen.getByText("Edit page not yet implemented"),
-    ).toBeInTheDocument();
-  });
 });
 
+const mockNavigate = vi.fn();
+vi.mock("react-router", async (importOriginal) => {
+  const originalModule = await importOriginal();
+  return {
+    ...originalModule,
+    useParams: vi.fn(() => ({
+      id: 17,
+    })),
+    Navigate: vi.fn((x) => {
+      mockNavigate(x);
+      return null;
+    }),
+  };
+});
+
+let axiosMock;
+describe("ArticlesEditPage tests", () => {
+  describe("when the backend doesn't return data", () => {
+    beforeEach(() => {
+      axiosMock = new AxiosMockAdapter(axios);
+      axiosMock.reset();
+      axiosMock.resetHistory();
+      axiosMock
+        .onGet("/api/currentUser")
+        .reply(200, apiCurrentUserFixtures.userOnly);
+      axiosMock
+        .onGet("/api/systemInfo")
+        .reply(200, systemInfoFixtures.showingNeither);
+      axiosMock.onGet("/api/articles", { params: { id: 17 } }).timeout();
+    });
+
+    afterEach(() => {
+      mockToast.mockClear();
+      mockNavigate.mockClear();
+      axiosMock.restore();
+      axiosMock.resetHistory();
+    });
+
+    const queryClient = new QueryClient();
+    test("renders header but table is not present", async () => {
+      const restoreConsole = mockConsole();
+
+      render(
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter>
+            <ArticlesEditPage />
+          </MemoryRouter>
+        </QueryClientProvider>,
+      );
+
+      await screen.findByText("Edit Article");
+      expect(
+        screen.queryByTestId("ArticlesForm-title"),
+      ).not.toBeInTheDocument();
+      restoreConsole();
+    });
+  });
+
+  describe("tests where backend is working normally", () => {
+    beforeEach(() => {
+      axiosMock = new AxiosMockAdapter(axios);
+      axiosMock.reset();
+      axiosMock.resetHistory();
+      axiosMock
+        .onGet("/api/currentUser")
+        .reply(200, apiCurrentUserFixtures.userOnly);
+      axiosMock
+        .onGet("/api/systemInfo")
+        .reply(200, systemInfoFixtures.showingNeither);
+      axiosMock.onGet("/api/articles", { params: { id: 17 } }).reply(200, {
+        id: 17,
+        title: "Test Article",
+        url: "https://example.com",
+        explanation: "This is a test article",
+        email: "test@example.com",
+        dateAdded: "2022-01-02T12:00:00",
+      });
+      axiosMock.onPut("/api/articles").reply(200, {
+        id: "17",
+        title: "Updated Article",
+        url: "https://example.com/updated",
+        explanation: "Updated explanation",
+        email: "updated@example.com",
+        dateAdded: "2022-01-03T12:00:00",
+      });
+    });
+
+    afterEach(() => {
+      mockToast.mockClear();
+      mockNavigate.mockClear();
+      axiosMock.restore();
+      axiosMock.resetHistory();
+    });
+
+    const queryClient = new QueryClient();
+
+    test("Is populated with the data provided", async () => {
+      render(
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter>
+            <ArticlesEditPage />
+          </MemoryRouter>
+        </QueryClientProvider>,
+      );
+
+      await screen.findByTestId("ArticlesForm-title");
+
+      const idField = screen.getByTestId("ArticlesForm-id");
+      const titleField = screen.getByTestId("ArticlesForm-title");
+      const urlField = screen.getByTestId("ArticlesForm-url");
+      const explanationField = screen.getByTestId("ArticlesForm-explanation");
+      const emailField = screen.getByTestId("ArticlesForm-email");
+      const dateAddedField = screen.getByTestId("ArticlesForm-dateAdded");
+      const submitButton = screen.getByTestId("ArticlesForm-submit");
+
+      expect(idField).toBeInTheDocument();
+      expect(idField).toHaveValue("17");
+      expect(titleField).toBeInTheDocument();
+      expect(titleField).toHaveValue("Test Article");
+      expect(urlField).toBeInTheDocument();
+      expect(urlField).toHaveValue("https://example.com");
+      expect(explanationField).toBeInTheDocument();
+      expect(explanationField).toHaveValue("This is a test article");
+      expect(emailField).toBeInTheDocument();
+      expect(emailField).toHaveValue("test@example.com");
+      expect(dateAddedField).toBeInTheDocument();
+      expect(dateAddedField).toHaveValue("2022-01-02T12:00");
+
+      expect(submitButton).toHaveTextContent("Update");
+
+      fireEvent.change(titleField, {
+        target: { value: "Updated Article" },
+      });
+      fireEvent.change(urlField, {
+        target: { value: "https://example.com/updated" },
+      });
+      fireEvent.change(explanationField, {
+        target: { value: "Updated explanation" },
+      });
+      fireEvent.change(emailField, {
+        target: { value: "updated@example.com" },
+      });
+      fireEvent.change(dateAddedField, {
+        target: { value: "2022-01-03T12:00" },
+      });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => expect(mockToast).toBeCalled());
+      expect(mockToast).toBeCalledWith(
+        "Article Updated - id: 17 title: Updated Article",
+      );
+
+      expect(mockNavigate).toBeCalledWith({ to: "/articles" });
+
+      expect(axiosMock.history.put.length).toBe(1); // times called
+      expect(axiosMock.history.put[0].params).toEqual({ id: 17 });
+      expect(axiosMock.history.put[0].data).toBe(
+        JSON.stringify({
+          title: "Updated Article",
+          url: "https://example.com/updated",
+          explanation: "Updated explanation",
+          email: "updated@example.com",
+          dateAdded: "2022-01-03T12:00:00",
+        }),
+      ); // posted object
+    });
+
+    test("Changes when you click Update", async () => {
+      render(
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter>
+            <ArticlesEditPage />
+          </MemoryRouter>
+        </QueryClientProvider>,
+      );
+
+      await screen.findByTestId("ArticlesForm-title");
+
+      const idField = screen.getByTestId("ArticlesForm-id");
+      const titleField = screen.getByTestId("ArticlesForm-title");
+      const submitButton = screen.getByTestId("ArticlesForm-submit");
+
+      expect(idField).toHaveValue("17");
+      expect(titleField).toHaveValue("Test Article");
+      expect(submitButton).toBeInTheDocument();
+
+      fireEvent.change(titleField, {
+        target: { value: "Updated Article" },
+      });
+
+      fireEvent.click(submitButton);
+
+      await waitFor(() => expect(mockToast).toBeCalled());
+      expect(mockToast).toBeCalledWith(
+        "Article Updated - id: 17 title: Updated Article",
+      );
+      expect(mockNavigate).toBeCalledWith({ to: "/articles" });
+    });
+  });
+});

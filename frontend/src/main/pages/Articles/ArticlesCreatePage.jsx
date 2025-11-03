@@ -5,17 +5,28 @@ import { useBackendMutation } from "main/utils/useBackend";
 import { toast } from "react-toastify";
 
 export default function ArticlesCreatePage({ storybook = false }) {
-  const objectToAxiosParams = (article) => ({
-    url: "/api/articles/post",
-    method: "POST",
-    params: {
-      title: article.title,
-      url: article.url,
-      explanation: article.explanation,
-      email: article.email,
-      dateAdded: article.dateAdded,
-    },
-  });
+  const objectToAxiosParams = (article) => {
+    // Convert dateAdded from datetime-local format (YYYY-MM-DDTHH:mm) to ISO format with seconds (YYYY-MM-DDTHH:mm:ss)
+    let dateAdded = article.dateAdded;
+    if (dateAdded && !dateAdded.includes(":")) {
+      // If no time part, add default time
+      dateAdded = dateAdded + "T00:00:00";
+    } else if (dateAdded && dateAdded.match(/T\d{2}:\d{2}$/)) {
+      // If format is YYYY-MM-DDTHH:mm (without seconds), add :00
+      dateAdded = dateAdded + ":00";
+    }
+    return {
+      url: "/api/articles/post",
+      method: "POST",
+      params: {
+        title: article.title,
+        url: article.url,
+        explanation: article.explanation,
+        email: article.email,
+        dateAdded: dateAdded,
+      },
+    };
+  };
 
   const onSuccess = (article) => {
     toast(
