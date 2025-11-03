@@ -64,6 +64,7 @@ describe("UCSBDiningCommonsMenuItemForm tests", () => {
     });
     fireEvent.change(stationField, { target: { value: "bad-input" } });
     fireEvent.click(submitButton);
+    expect(await screen.findByText(/Name is required./)).toBeInTheDocument();
 
     // await screen.findByText(/QuarterYYYYQ must be in the format YYYYQ/);
     // expect(
