@@ -130,5 +130,45 @@ describe("ArticlesCreatePage tests", () => {
     );
     expect(mockNavigate).toBeCalledWith({ to: "/articles" });
   });
+
+  test("converts date format when date has no time part", async () => {
+    const queryClient = new QueryClient();
+    const article = {
+      id: 2,
+      title: "Another Article",
+      url: "https://example2.com",
+      explanation: "Another test article",
+      email: "test2@example.com",
+      dateAdded: "2022-01-02T00:00:00",
+    };
+
+    axiosMock.onPost("/api/articles/post").reply(202, article);
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <ArticlesCreatePage />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("ArticlesForm-title")).toBeInTheDocument();
+    });
+
+    const titleInput = screen.getByTestId("ArticlesForm-title");
+    const dateAddedInput = screen.getByTestId("ArticlesForm-dateAdded");
+    const createButton = screen.getByTestId("ArticlesForm-submit");
+
+    fireEvent.change(titleInput, { target: { value: "Another Article" } });
+    fireEvent.change(dateAddedInput, {
+      target: { value: "2022-01-02" },
+    });
+    fireEvent.click(createButton);
+
+    await waitFor(() => expect(axiosMock.history.post.length).toBe(1));
+
+    expect(axiosMock.history.post[0].params.dateAdded).toBe("2022-01-02T00:00:00");
+  });
 });
 

@@ -216,5 +216,40 @@ describe("ArticlesEditPage tests", () => {
       );
       expect(mockNavigate).toBeCalledWith({ to: "/articles" });
     });
+
+    test("converts date format when date has no time part", async () => {
+      axiosMock.onGet("/api/articles", { params: { id: 17 } }).reply(200, {
+        id: 17,
+        title: "Test Article",
+        url: "https://example.com",
+        explanation: "This is a test article",
+        email: "test@example.com",
+        dateAdded: "2022-01-02T00:00:00",
+      });
+
+      render(
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter>
+            <ArticlesEditPage />
+          </MemoryRouter>
+        </QueryClientProvider>,
+      );
+
+      await screen.findByTestId("ArticlesForm-title");
+
+      const dateAddedField = screen.getByTestId("ArticlesForm-dateAdded");
+      const submitButton = screen.getByTestId("ArticlesForm-submit");
+
+      fireEvent.change(dateAddedField, {
+        target: { value: "2022-01-03" },
+      });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => expect(mockToast).toBeCalled());
+
+      expect(axiosMock.history.put.length).toBe(1);
+      const putData = JSON.parse(axiosMock.history.put[0].data);
+      expect(putData.dateAdded).toBe("2022-01-03T00:00:00");
+    });
   });
 });
