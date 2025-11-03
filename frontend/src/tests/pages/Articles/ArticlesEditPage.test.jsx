@@ -1,10 +1,11 @@
-import { fireEvent, render, waitFor, screen, renderHook, act } from "@testing-library/react";
+import { fireEvent, render, waitFor, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router";
-import ArticlesEditPage from "main/pages/Articles/ArticlesEditPage";
+import ArticlesIndexPage from "main/pages/Articles/ArticlesIndexPage";
 
 import { apiCurrentUserFixtures } from "fixtures/currentUserFixtures";
 import { systemInfoFixtures } from "fixtures/systemInfoFixtures";
+import { articlesFixtures } from "fixtures/articlesFixtures";
 import axios from "axios";
 import AxiosMockAdapter from "axios-mock-adapter";
 import mockConsole from "tests/testutils/mockConsole";
@@ -18,341 +19,149 @@ vi.mock("react-toastify", async (importOriginal) => {
   };
 });
 
-const mockNavigate = vi.fn();
-vi.mock("react-router", async (importOriginal) => {
-  const originalModule = await importOriginal();
-  return {
-    ...originalModule,
-    useParams: vi.fn(() => ({
-      id: 17,
-    })),
-    Navigate: vi.fn((x) => {
-      mockNavigate(x);
-      return null;
-    }),
+describe("ArticlesIndexPage tests", () => {
+  const axiosMock = new AxiosMockAdapter(axios);
+
+  const testId = "ArticlesTable";
+
+  const setupUserOnly = () => {
+    axiosMock.reset();
+    axiosMock.resetHistory();
+    axiosMock.onGet("/api/currentUser").reply(200, apiCurrentUserFixtures.userOnly);
+    axiosMock.onGet("/api/systemInfo").reply(200, systemInfoFixtures.showingNeither);
   };
-});
 
-let axiosMock;
-describe("ArticlesEditPage tests", () => {
-  describe("when the backend doesn't return data", () => {
-    beforeEach(() => {
-      axiosMock = new AxiosMockAdapter(axios);
-      axiosMock.reset();
-      axiosMock.resetHistory();
-      axiosMock
-        .onGet("/api/currentUser")
-        .reply(200, apiCurrentUserFixtures.userOnly);
-      axiosMock
-        .onGet("/api/systemInfo")
-        .reply(200, systemInfoFixtures.showingNeither);
-      axiosMock.onGet("/api/articles", { params: { id: 17 } }).timeout();
-    });
+  const setupAdminUser = () => {
+    axiosMock.reset();
+    axiosMock.resetHistory();
+    axiosMock.onGet("/api/currentUser").reply(200, apiCurrentUserFixtures.adminUser);
+    axiosMock.onGet("/api/systemInfo").reply(200, systemInfoFixtures.showingNeither);
+  };
 
-    afterEach(() => {
-      mockToast.mockClear();
-      mockNavigate.mockClear();
-      axiosMock.restore();
-      axiosMock.resetHistory();
-    });
-
+  test("Renders with Create Button for admin user", async () => {
+    setupAdminUser();
     const queryClient = new QueryClient();
-    test("renders header but table is not present", async () => {
-      const restoreConsole = mockConsole();
+    axiosMock.onGet("/api/articles/all").reply(200, []);
 
-      render(
-        <QueryClientProvider client={queryClient}>
-          <MemoryRouter>
-            <ArticlesEditPage />
-          </MemoryRouter>
-        </QueryClientProvider>,
-      );
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <ArticlesIndexPage />
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
 
-      await screen.findByText("Edit Article");
-      expect(
-        screen.queryByTestId("ArticlesForm-title"),
-      ).not.toBeInTheDocument();
-      restoreConsole();
+    await waitFor(() => {
+      expect(screen.getByText(/Create Article/)).toBeInTheDocument();
     });
+    const button = screen.getByText(/Create Article/);
+    expect(button).toHaveAttribute("href", "/articles/create");
+    expect(button).toHaveAttribute("style", "float: right;");
   });
 
-  describe("tests where backend is working normally", () => {
-    beforeEach(() => {
-      axiosMock = new AxiosMockAdapter(axios);
-      axiosMock.reset();
-      axiosMock.resetHistory();
-      axiosMock
-        .onGet("/api/currentUser")
-        .reply(200, apiCurrentUserFixtures.userOnly);
-      axiosMock
-        .onGet("/api/systemInfo")
-        .reply(200, systemInfoFixtures.showingNeither);
-      axiosMock.onGet("/api/articles", { params: { id: 17 } }).reply(200, {
-        id: 17,
-        title: "Test Article",
-        url: "https://example.com",
-        explanation: "This is a test article",
-        email: "test@example.com",
-        dateAdded: "2022-01-02T12:00:00",
-      });
-      axiosMock.onPut("/api/articles").reply(200, {
-        id: "17",
-        title: "Updated Article",
-        url: "https://example.com/updated",
-        explanation: "Updated explanation",
-        email: "updated@example.com",
-        dateAdded: "2022-01-03T12:00:00",
-      });
-    });
-
-    afterEach(() => {
-      mockToast.mockClear();
-      mockNavigate.mockClear();
-      axiosMock.restore();
-      axiosMock.resetHistory();
-    });
-
+  test("renders three articles correctly for regular user", async () => {
+    setupUserOnly();
     const queryClient = new QueryClient();
+    axiosMock.onGet("/api/articles/all").reply(200, articlesFixtures.threeRestaurants);
 
-    test("Is populated with the data provided", async () => {
-      render(
-        <QueryClientProvider client={queryClient}>
-          <MemoryRouter>
-            <ArticlesEditPage />
-          </MemoryRouter>
-        </QueryClientProvider>,
-      );
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <ArticlesIndexPage />
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
 
-      await screen.findByTestId("ArticlesForm-title");
+    await waitFor(() => {
+      expect(screen.getByTestId(`${testId}-cell-row-0-col-id`)).toHaveTextContent("2");
+    });
+    expect(screen.getByTestId(`${testId}-cell-row-1-col-id`)).toHaveTextContent("3");
+    expect(screen.getByTestId(`${testId}-cell-row-2-col-id`)).toHaveTextContent("4");
 
-      const idField = screen.getByTestId("ArticlesForm-id");
-      const titleField = screen.getByTestId("ArticlesForm-title");
-      const urlField = screen.getByTestId("ArticlesForm-url");
-      const explanationField = screen.getByTestId("ArticlesForm-explanation");
-      const emailField = screen.getByTestId("ArticlesForm-email");
-      const dateAddedField = screen.getByTestId("ArticlesForm-dateAdded");
-      const submitButton = screen.getByTestId("ArticlesForm-submit");
+    expect(screen.queryByText(/Create Article/)).not.toBeInTheDocument();
+  });
 
-      expect(idField).toBeInTheDocument();
-      expect(idField).toHaveValue("17");
-      expect(titleField).toBeInTheDocument();
-      expect(titleField).toHaveValue("Test Article");
-      expect(urlField).toBeInTheDocument();
-      expect(urlField).toHaveValue("https://example.com");
-      expect(explanationField).toBeInTheDocument();
-      expect(explanationField).toHaveValue("This is a test article");
-      expect(emailField).toBeInTheDocument();
-      expect(emailField).toHaveValue("test@example.com");
-      expect(dateAddedField).toBeInTheDocument();
-      expect(dateAddedField).toHaveValue("2022-01-02T12:00");
+  test("renders empty table when backend unavailable, user only", async () => {
+    setupUserOnly();
+    const queryClient = new QueryClient();
+    axiosMock.onGet("/api/articles/all").timeout();
+    const restoreConsole = mockConsole();
 
-      expect(submitButton).toHaveTextContent("Update");
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <ArticlesIndexPage />
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
 
-      fireEvent.change(titleField, {
-        target: { value: "Updated Article" },
-      });
-      fireEvent.change(urlField, {
-        target: { value: "https://example.com/updated" },
-      });
-      fireEvent.change(explanationField, {
-        target: { value: "Updated explanation" },
-      });
-      fireEvent.change(emailField, {
-        target: { value: "updated@example.com" },
-      });
-      fireEvent.change(dateAddedField, {
-        target: { value: "2022-01-03T12:00" },
-      });
-      fireEvent.click(submitButton);
-
-      await waitFor(() => expect(mockToast).toBeCalled());
-      expect(mockToast).toBeCalledWith(
-        "Article Updated - id: 17 title: Updated Article",
-      );
-
-      expect(mockNavigate).toBeCalledWith({ to: "/articles" });
-
-      expect(axiosMock.history.put.length).toBe(1); // times called
-      expect(axiosMock.history.put[0].params).toEqual({ id: 17 });
-      expect(axiosMock.history.put[0].data).toBe(
-        JSON.stringify({
-          title: "Updated Article",
-          url: "https://example.com/updated",
-          explanation: "Updated explanation",
-          email: "updated@example.com",
-          dateAdded: "2022-01-03T12:00:00",
-        }),
-      ); // posted object
+    await waitFor(() => {
+      expect(axiosMock.history.get.length).toBeGreaterThanOrEqual(1);
     });
 
-    test("Changes when you click Update", async () => {
-      render(
-        <QueryClientProvider client={queryClient}>
-          <MemoryRouter>
-            <ArticlesEditPage />
-          </MemoryRouter>
-        </QueryClientProvider>,
-      );
+    const errorMessage = console.error.mock.calls[0][0];
+    expect(errorMessage).toMatch("Error communicating with backend via GET on /api/articles/all");
+    restoreConsole();
 
-      await screen.findByTestId("ArticlesForm-title");
+    expect(screen.queryByTestId(`${testId}-cell-row-0-col-id`)).not.toBeInTheDocument();
+  });
 
-      const idField = screen.getByTestId("ArticlesForm-id");
-      const titleField = screen.getByTestId("ArticlesForm-title");
-      const submitButton = screen.getByTestId("ArticlesForm-submit");
+  test("what happens when you click delete, admin", async () => {
+    setupAdminUser();
+    const queryClient = new QueryClient();
+    axiosMock.onGet("/api/articles/all").reply(200, articlesFixtures.threeRestaurants);
+    axiosMock.onDelete("/api/articles").reply(200, "Articles with id 2 deleted");
 
-      expect(idField).toHaveValue("17");
-      expect(titleField).toHaveValue("Test Article");
-      expect(submitButton).toBeInTheDocument();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <ArticlesIndexPage />
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
 
-      fireEvent.change(titleField, {
-        target: { value: "Updated Article" },
-      });
-
-      fireEvent.click(submitButton);
-
-      await waitFor(() => expect(mockToast).toBeCalled());
-      expect(mockToast).toBeCalledWith(
-        "Article Updated - id: 17 title: Updated Article",
-      );
-      expect(mockNavigate).toBeCalledWith({ to: "/articles" });
+    await waitFor(() => {
+      expect(screen.getByTestId(`${testId}-cell-row-0-col-id`)).toBeInTheDocument();
     });
 
-    test("converts date format when date has no time part", async () => {
-      axiosMock.onGet("/api/articles", { params: { id: 17 } }).reply(200, {
-        id: 17,
-        title: "Test Article",
-        url: "https://example.com",
-        explanation: "This is a test article",
-        email: "test@example.com",
-        dateAdded: "2022-01-02T00:00:00",
-      });
-      axiosMock.onPut("/api/articles").reply(200, {
-        id: "17",
-        title: "Test Article",
-        url: "https://example.com",
-        explanation: "This is a test article",
-        email: "test@example.com",
-        dateAdded: "2022-01-03T00:00:00",
-      });
+    expect(screen.getByTestId(`${testId}-cell-row-0-col-id`)).toHaveTextContent("2");
 
-      render(
-        <QueryClientProvider client={queryClient}>
-          <MemoryRouter>
-            <ArticlesEditPage />
-          </MemoryRouter>
-        </QueryClientProvider>,
-      );
+    const deleteButton = screen.getByTestId(`${testId}-cell-row-0-col-Delete-button`);
+    expect(deleteButton).toBeInTheDocument();
 
-      await screen.findByTestId("ArticlesForm-title");
+    fireEvent.click(deleteButton);
 
-      const dateAddedField = screen.getByTestId("ArticlesForm-dateAdded");
-      const submitButton = screen.getByTestId("ArticlesForm-submit");
-
-      fireEvent.change(dateAddedField, {
-        target: { value: "2022-01-03T00:00" },
-      });
-      fireEvent.click(submitButton);
-
-      await waitFor(() => expect(axiosMock.history.put.length).toBe(1));
-      
-      await waitFor(() => expect(mockToast).toBeCalled());
-
-      const putData = JSON.parse(axiosMock.history.put[0].data);
-      expect(putData.dateAdded).toBe("2022-01-03T00:00:00");
+    await waitFor(() => {
+      expect(mockToast).toBeCalledWith("Articles with id 2 deleted");
     });
 
-    test("converts date format when date has no colon (YYYY-MM-DD format)", async () => {
-      axiosMock.onGet("/api/articles", { params: { id: 17 } }).reply(200, {
-        id: 17,
-        title: "Test Article",
-        url: "https://example.com",
-        explanation: "This is a test article",
-        email: "test@example.com",
-        dateAdded: "2022-01-02T00:00:00",
-      });
-      axiosMock.onPut("/api/articles").reply(200, {
-        id: "17",
-        title: "Test Article",
-        url: "https://example.com",
-        explanation: "This is a test article",
-        email: "test@example.com",
-        dateAdded: "2022-01-04T00:00:00",
-      });
+    // 更强断言：确保发起了 DELETE 到正确端点
+    await waitFor(() => expect(axiosMock.history.delete.length).toBe(1));
+    expect(axiosMock.history.delete[0].url).toBe("/api/articles");
+    expect(axiosMock.history.delete[0].method?.toLowerCase?.()).toBe("delete");
+  });
 
-      render(
-        <QueryClientProvider client={queryClient}>
-          <MemoryRouter>
-            <ArticlesEditPage />
-          </MemoryRouter>
-        </QueryClientProvider>,
-      );
+  test("delete failure does NOT show success toast (admin)", async () => {
+    setupAdminUser();
+    const queryClient = new QueryClient();
+    axiosMock.onGet("/api/articles/all").reply(200, articlesFixtures.threeRestaurants);
+    axiosMock.onDelete("/api/articles").reply(500);
 
-      await screen.findByTestId("ArticlesForm-title");
-      expect(screen.getByTestId("ArticlesForm-title")).toBeInTheDocument();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <ArticlesIndexPage />
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId(`${testId}-cell-row-0-col-id`)).toBeInTheDocument();
     });
 
-    test("converts date format when date has no colon - direct mutation test", async () => {
-      // This test directly tests the date conversion logic by using useBackendMutation
-      // with a date that has no colon (YYYY-MM-DD format)
-      const { useBackendMutation } = await import("main/utils/useBackend");
-      
-      const testQueryClient = new QueryClient();
-      const wrapper = ({ children }) => (
-        <QueryClientProvider client={testQueryClient}>
-          <MemoryRouter>{children}</MemoryRouter>
-        </QueryClientProvider>
-      );
+    fireEvent.click(screen.getByTestId(`${testId}-cell-row-0-col-Delete-button`));
 
-      axiosMock.onPut("/api/articles").reply(200, {
-        id: "17",
-        title: "Test Article",
-        url: "https://example.com",
-        explanation: "This is a test article",
-        email: "test@example.com",
-        dateAdded: "2022-01-04T00:00:00",
-      });
-
-      // Replicate the objectToAxiosPutParams function from ArticlesEditPage
-      const objectToAxiosPutParams = (article) => {
-        let dateAdded = article.dateAdded;
-        if (dateAdded && !dateAdded.includes(":")) {
-          dateAdded = dateAdded + "T00:00:00";
-        } else if (dateAdded && dateAdded.match(/T\d{2}:\d{2}$/)) {
-          dateAdded = dateAdded + ":00";
-        }
-        return {
-          url: "/api/articles",
-          method: "PUT",
-          params: { id: article.id },
-          data: {
-            title: article.title,
-            url: article.url,
-            explanation: article.explanation,
-            email: article.email,
-            dateAdded: dateAdded,
-          },
-        };
-      };
-
-      const { result } = renderHook(
-        () => useBackendMutation(objectToAxiosPutParams, {}, [`/api/articles?id=17`]),
-        { wrapper },
-      );
-
-      act(() => {
-        result.current.mutate({
-          id: 17,
-          title: "Test Article",
-          url: "https://example.com",
-          explanation: "This is a test article",
-          email: "test@example.com",
-          dateAdded: "2022-01-04", // No colon - triggers conversion
-        });
-      });
-
-      await waitFor(() => expect(axiosMock.history.put.length).toBe(1));
-      const putData = JSON.parse(axiosMock.history.put[0].data);
-      expect(putData.dateAdded).toBe("2022-01-04T00:00:00");
-    });
+    await waitFor(() => expect(axiosMock.history.delete.length).toBe(1));
+    expect(mockToast).not.toHaveBeenCalledWith("Articles with id 2 deleted");
   });
 });
