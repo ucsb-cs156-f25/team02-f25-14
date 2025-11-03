@@ -249,13 +249,14 @@ describe("ArticlesEditPage tests", () => {
       const submitButton = screen.getByTestId("ArticlesForm-submit");
 
       fireEvent.change(dateAddedField, {
-        target: { value: "2022-01-03" },
+        target: { value: "2022-01-03T00:00" },
       });
       fireEvent.click(submitButton);
 
+      await waitFor(() => expect(axiosMock.history.put.length).toBe(1));
+      
       await waitFor(() => expect(mockToast).toBeCalled());
 
-      expect(axiosMock.history.put.length).toBe(1);
       const putData = JSON.parse(axiosMock.history.put[0].data);
       expect(putData.dateAdded).toBe("2022-01-03T00:00:00");
     });

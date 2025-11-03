@@ -157,12 +157,20 @@ describe("ArticlesCreatePage tests", () => {
     });
 
     const titleInput = screen.getByTestId("ArticlesForm-title");
+    const urlInput = screen.getByTestId("ArticlesForm-url");
+    const explanationInput = screen.getByTestId("ArticlesForm-explanation");
+    const emailInput = screen.getByTestId("ArticlesForm-email");
     const dateAddedInput = screen.getByTestId("ArticlesForm-dateAdded");
     const createButton = screen.getByTestId("ArticlesForm-submit");
 
     fireEvent.change(titleInput, { target: { value: "Another Article" } });
+    fireEvent.change(urlInput, { target: { value: "https://example2.com" } });
+    fireEvent.change(explanationInput, {
+      target: { value: "Another test article" },
+    });
+    fireEvent.change(emailInput, { target: { value: "test2@example.com" } });
     fireEvent.change(dateAddedInput, {
-      target: { value: "2022-01-02" },
+      target: { value: "2022-01-02T00:00" },
     });
     fireEvent.click(createButton);
 
