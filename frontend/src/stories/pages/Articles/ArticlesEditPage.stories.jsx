@@ -13,6 +13,7 @@ export default {
 
 const Template = () => <ArticlesEditPage storybook={true} />;
 
+
 export const Default = Template.bind({});
 Default.parameters = {
   msw: [
