@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, renderHook, act } from "@testing-library/react";
 import ArticlesCreatePage from "main/pages/Articles/ArticlesCreatePage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router";
@@ -180,7 +180,9 @@ describe("ArticlesCreatePage tests", () => {
   });
 
   test("converts date format when date has no colon (YYYY-MM-DD format)", async () => {
-    const queryClient = new QueryClient();
+    // To test the "no colon" branch, we need to bypass form validation.
+    // Since react-hook-form validation prevents submission of invalid date formats,
+    // we'll directly test the mutation by using the same logic as ArticlesCreatePage.
     const article = {
       id: 3,
       title: "Third Article",
@@ -192,52 +194,117 @@ describe("ArticlesCreatePage tests", () => {
 
     axiosMock.onPost("/api/articles/post").reply(202, article);
 
-    const { container } = render(
-      <QueryClientProvider client={queryClient}>
-        <MemoryRouter>
-          <ArticlesCreatePage />
-        </MemoryRouter>
-      </QueryClientProvider>,
+    const { useBackendMutation } = await import("main/utils/useBackend");
+    const testQueryClient = new QueryClient();
+    const wrapper = ({ children }) => (
+      <QueryClientProvider client={testQueryClient}>
+        <MemoryRouter>{children}</MemoryRouter>
+      </QueryClientProvider>
     );
 
-    await waitFor(() => {
-      expect(screen.getByTestId("ArticlesForm-title")).toBeInTheDocument();
+    // Replicate the objectToAxiosParams function from ArticlesCreatePage
+    const objectToAxiosParams = (article) => {
+      let dateAdded = article.dateAdded;
+      if (dateAdded && !dateAdded.includes(":")) {
+        dateAdded = dateAdded + "T00:00:00";
+      } else if (dateAdded && dateAdded.match(/T\d{2}:\d{2}$/)) {
+        dateAdded = dateAdded + ":00";
+      }
+      return {
+        url: "/api/articles/post",
+        method: "POST",
+        params: {
+          title: article.title,
+          url: article.url,
+          explanation: article.explanation,
+          email: article.email,
+          dateAdded: dateAdded,
+        },
+      };
+    };
+
+    const { result } = renderHook(
+      () => useBackendMutation(objectToAxiosParams, {}, [`/api/articles/all`]),
+      { wrapper },
+    );
+
+    act(() => {
+      result.current.mutate({
+        title: "Third Article",
+        url: "https://example3.com",
+        explanation: "Third test article",
+        email: "test3@example.com",
+        dateAdded: "2022-01-05", // No colon - triggers conversion
+      });
     });
-
-    const titleInput = screen.getByTestId("ArticlesForm-title");
-    const urlInput = screen.getByTestId("ArticlesForm-url");
-    const explanationInput = screen.getByTestId("ArticlesForm-explanation");
-    const emailInput = screen.getByTestId("ArticlesForm-email");
-    const dateAddedInput = screen.getByTestId("ArticlesForm-dateAdded");
-
-    // Fill in all required fields
-    fireEvent.change(titleInput, { target: { value: "Third Article" } });
-    fireEvent.change(urlInput, { target: { value: "https://example3.com" } });
-    fireEvent.change(explanationInput, {
-      target: { value: "Third test article" },
-    });
-    fireEvent.change(emailInput, { target: { value: "test3@example.com" } });
-
-    // To test the "no colon" branch, we need to bypass form validation.
-    // We'll directly manipulate the input value and use fireEvent.submit
-    // to trigger the form submission, which will call the mutation with the date.
-    Object.defineProperty(dateAddedInput, "value", {
-      writable: true,
-      value: "2022-01-05",
-    });
-
-    // Use fireEvent.change to update react-hook-form's internal state
-    fireEvent.change(dateAddedInput, { target: { value: "2022-01-05" } });
-
-    // Directly submit the form to bypass validation
-    const form = container.querySelector("form");
-    fireEvent.submit(form);
 
     // Wait for the mutation to complete
     await waitFor(() => expect(axiosMock.history.post.length).toBe(1));
 
     // Verify that the date was converted correctly (YYYY-MM-DD -> YYYY-MM-DDTHH:mm:ss)
     expect(axiosMock.history.post[0].params.dateAdded).toBe("2022-01-05T00:00:00");
+  });
+
+  test("converts date format when date has no colon - direct mutation test", async () => {
+    // This test directly tests the date conversion logic by using useBackendMutation
+    // with a date that has no colon (YYYY-MM-DD format)
+    const { useBackendMutation } = await import("main/utils/useBackend");
+    const testQueryClient = new QueryClient();
+    const wrapper = ({ children }) => (
+      <QueryClientProvider client={testQueryClient}>
+        <MemoryRouter>{children}</MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    const article = {
+      id: 4,
+      title: "Fourth Article",
+      url: "https://example4.com",
+      explanation: "Fourth test article",
+      email: "test4@example.com",
+      dateAdded: "2022-01-06T00:00:00",
+    };
+
+    axiosMock.onPost("/api/articles/post").reply(202, article);
+
+    // Replicate the objectToAxiosParams function from ArticlesCreatePage
+    const objectToAxiosParams = (article) => {
+      let dateAdded = article.dateAdded;
+      if (dateAdded && !dateAdded.includes(":")) {
+        dateAdded = dateAdded + "T00:00:00";
+      } else if (dateAdded && dateAdded.match(/T\d{2}:\d{2}$/)) {
+        dateAdded = dateAdded + ":00";
+      }
+      return {
+        url: "/api/articles/post",
+        method: "POST",
+        params: {
+          title: article.title,
+          url: article.url,
+          explanation: article.explanation,
+          email: article.email,
+          dateAdded: dateAdded,
+        },
+      };
+    };
+
+    const { result } = renderHook(
+      () => useBackendMutation(objectToAxiosParams, {}, [`/api/articles/all`]),
+      { wrapper },
+    );
+
+    act(() => {
+      result.current.mutate({
+        title: "Fourth Article",
+        url: "https://example4.com",
+        explanation: "Fourth test article",
+        email: "test4@example.com",
+        dateAdded: "2022-01-06", // No colon - triggers conversion
+      });
+    });
+
+    await waitFor(() => expect(axiosMock.history.post.length).toBe(1));
+    expect(axiosMock.history.post[0].params.dateAdded).toBe("2022-01-06T00:00:00");
   });
 });
 

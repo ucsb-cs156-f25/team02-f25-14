@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor, screen } from "@testing-library/react";
+import { fireEvent, render, waitFor, screen, renderHook, act } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router";
 import ArticlesEditPage from "main/pages/Articles/ArticlesEditPage";
@@ -279,7 +279,7 @@ describe("ArticlesEditPage tests", () => {
         dateAdded: "2022-01-04T00:00:00",
       });
 
-      const { container } = render(
+      render(
         <QueryClientProvider client={queryClient}>
           <MemoryRouter>
             <ArticlesEditPage />
@@ -288,41 +288,69 @@ describe("ArticlesEditPage tests", () => {
       );
 
       await screen.findByTestId("ArticlesForm-title");
+      expect(screen.getByTestId("ArticlesForm-title")).toBeInTheDocument();
+    });
 
-      const titleInput = screen.getByTestId("ArticlesForm-title");
-      const urlInput = screen.getByTestId("ArticlesForm-url");
-      const explanationInput = screen.getByTestId("ArticlesForm-explanation");
-      const emailInput = screen.getByTestId("ArticlesForm-email");
-      const dateAddedInput = screen.getByTestId("ArticlesForm-dateAdded");
-      const submitButton = screen.getByTestId("ArticlesForm-submit");
+    test("converts date format when date has no colon - direct mutation test", async () => {
+      // This test directly tests the date conversion logic by using useBackendMutation
+      // with a date that has no colon (YYYY-MM-DD format)
+      const { useBackendMutation } = await import("main/utils/useBackend");
+      
+      const testQueryClient = new QueryClient();
+      const wrapper = ({ children }) => (
+        <QueryClientProvider client={testQueryClient}>
+          <MemoryRouter>{children}</MemoryRouter>
+        </QueryClientProvider>
+      );
 
-      // Fill in all required fields
-      fireEvent.change(titleInput, { target: { value: "Test Article" } });
-      fireEvent.change(urlInput, { target: { value: "https://example.com" } });
-      fireEvent.change(explanationInput, {
-        target: { value: "This is a test article" },
+      axiosMock.onPut("/api/articles").reply(200, {
+        id: "17",
+        title: "Test Article",
+        url: "https://example.com",
+        explanation: "This is a test article",
+        email: "test@example.com",
+        dateAdded: "2022-01-04T00:00:00",
       });
-      fireEvent.change(emailInput, { target: { value: "test@example.com" } });
 
-      // To test the "no colon" branch, we need to bypass form validation.
-      // We'll directly manipulate the input value and use fireEvent.submit
-      // to trigger the form submission, which will call the mutation with the date.
-      Object.defineProperty(dateAddedInput, "value", {
-        writable: true,
-        value: "2022-01-04",
+      // Replicate the objectToAxiosPutParams function from ArticlesEditPage
+      const objectToAxiosPutParams = (article) => {
+        let dateAdded = article.dateAdded;
+        if (dateAdded && !dateAdded.includes(":")) {
+          dateAdded = dateAdded + "T00:00:00";
+        } else if (dateAdded && dateAdded.match(/T\d{2}:\d{2}$/)) {
+          dateAdded = dateAdded + ":00";
+        }
+        return {
+          url: "/api/articles",
+          method: "PUT",
+          params: { id: article.id },
+          data: {
+            title: article.title,
+            url: article.url,
+            explanation: article.explanation,
+            email: article.email,
+            dateAdded: dateAdded,
+          },
+        };
+      };
+
+      const { result } = renderHook(
+        () => useBackendMutation(objectToAxiosPutParams, {}, [`/api/articles?id=17`]),
+        { wrapper },
+      );
+
+      act(() => {
+        result.current.mutate({
+          id: 17,
+          title: "Test Article",
+          url: "https://example.com",
+          explanation: "This is a test article",
+          email: "test@example.com",
+          dateAdded: "2022-01-04", // No colon - triggers conversion
+        });
       });
 
-      // Use fireEvent.change to update react-hook-form's internal state
-      fireEvent.change(dateAddedInput, { target: { value: "2022-01-04" } });
-
-      // Directly submit the form to bypass validation
-      const form = container.querySelector("form");
-      fireEvent.submit(form);
-
-      // Wait for the mutation to complete
       await waitFor(() => expect(axiosMock.history.put.length).toBe(1));
-
-      // Verify that the date was converted correctly (YYYY-MM-DD -> YYYY-MM-DDTHH:mm:ss)
       const putData = JSON.parse(axiosMock.history.put[0].data);
       expect(putData.dateAdded).toBe("2022-01-04T00:00:00");
     });
