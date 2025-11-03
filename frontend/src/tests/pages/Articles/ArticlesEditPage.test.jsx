@@ -143,8 +143,15 @@ describe("ArticlesIndexPage tests", () => {
 
   test("delete failure does NOT show success toast (admin)", async () => {
     setupAdminUser();
-    const queryClient = new QueryClient();
-    // Mock GET requests for both initial load and refetch after delete failure
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false, // Disable retries for faster test execution
+        },
+      },
+    });
+    // Mock GET requests - this will match all GET requests including refetch after delete
+    // Using replyOnce for the initial request and onGet for subsequent requests
     axiosMock.onGet("/api/articles/all").reply(200, articlesFixtures.threeRestaurants);
     axiosMock.onDelete("/api/articles").reply(500);
 
@@ -160,14 +167,21 @@ describe("ArticlesIndexPage tests", () => {
       expect(screen.getByTestId(`${testId}-cell-row-0-col-id`)).toBeInTheDocument();
     });
 
+    // Clear any toasts that may have been called during initial render
+    mockToast.mockClear();
+    
     fireEvent.click(screen.getByTestId(`${testId}-cell-row-0-col-Delete-button`));
 
+    // Wait for delete request to complete
     await waitFor(() => expect(axiosMock.history.delete.length).toBe(1));
     
-    // Wait a bit to allow any async operations (refetch, error handling) to complete
-    await waitFor(() => {
-      // The key assertion: success toast should NOT be shown
-      expect(mockToast).not.toHaveBeenCalledWith("Articles with id 2 deleted");
-    }, { timeout: 3000 });
+    // Wait a bit for any async operations (refetch, error handling) to complete
+    // This ensures we give time for invalidateQueries to trigger refetch if it happens
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // The key assertion: success toast should NOT be shown
+    // Note: Error toasts may be shown (from useBackendMutation's onError handler),
+    // but the success toast from onDeleteSuccess should NOT be shown
+    expect(mockToast).not.toHaveBeenCalledWith("Articles with id 2 deleted");
   });
 });
