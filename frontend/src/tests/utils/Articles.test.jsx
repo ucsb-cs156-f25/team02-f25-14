@@ -1,6 +1,8 @@
 import {
   onDeleteSuccess,
   cellToAxiosParamsDelete,
+  articleToCreateParams,
+  articleToPutParams,
 } from "main/utils/ArticlesUtils";
 import mockConsole from "tests/testutils/mockConsole";
 
@@ -45,6 +47,70 @@ describe("ArticlesUtils", () => {
         method: "DELETE",
         params: { id: 17 },
       });
+    });
+  });
+
+  describe("articleToCreateParams", () => {
+    test("adds default time when no time component present", () => {
+      const article = {
+        title: "Title",
+        url: "https://example.com",
+        explanation: "Explain",
+        email: "user@example.com",
+        dateAdded: "2023-11-10",
+      };
+
+      const result = articleToCreateParams(article);
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          url: "/api/articles/post",
+          method: "POST",
+          params: expect.objectContaining({
+            dateAdded: "2023-11-10T00:00:00",
+          }),
+        }),
+      );
+    });
+
+    test("appends seconds when missing", () => {
+      const article = {
+        title: "Title",
+        url: "https://example.com",
+        explanation: "Explain",
+        email: "user@example.com",
+        dateAdded: "2023-11-10T09:30",
+      };
+
+      const result = articleToCreateParams(article);
+
+      expect(result.params.dateAdded).toBe("2023-11-10T09:30:00");
+    });
+  });
+
+  describe("articleToPutParams", () => {
+    test("passes through data with normalized date", () => {
+      const article = {
+        id: 7,
+        title: "Title",
+        url: "https://example.com",
+        explanation: "Explain",
+        email: "user@example.com",
+        dateAdded: "2023-11-10T09:30",
+      };
+
+      const result = articleToPutParams(article);
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          url: "/api/articles",
+          method: "PUT",
+          params: { id: 7 },
+          data: expect.objectContaining({
+            dateAdded: "2023-11-10T09:30:00",
+          }),
+        }),
+      );
     });
   });
 });

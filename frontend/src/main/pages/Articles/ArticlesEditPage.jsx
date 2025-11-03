@@ -4,6 +4,7 @@ import ArticlesForm from "main/components/Articles/ArticlesForm";
 import { Navigate } from "react-router";
 import { useBackend, useBackendMutation } from "main/utils/useBackend";
 import { toast } from "react-toastify";
+import { articleToPutParams } from "main/utils/ArticlesUtils";
 
 export default function ArticlesEditPage({ storybook = false }) {
   let { id } = useParams();
@@ -25,38 +26,12 @@ export default function ArticlesEditPage({ storybook = false }) {
     },
   );
 
-  const objectToAxiosPutParams = (article) => {
-    // Convert dateAdded from datetime-local format (YYYY-MM-DDTHH:mm) to ISO format with seconds (YYYY-MM-DDTHH:mm:ss)
-    let dateAdded = article.dateAdded;
-    if (dateAdded && !dateAdded.includes(":")) {
-      // If no time part, add default time
-      dateAdded = dateAdded + "T00:00:00";
-    } else if (dateAdded && dateAdded.match(/T\d{2}:\d{2}$/)) {
-      // If format is YYYY-MM-DDTHH:mm (without seconds), add :00
-      dateAdded = dateAdded + ":00";
-    }
-    return {
-      url: "/api/articles",
-      method: "PUT",
-      params: {
-        id: article.id,
-      },
-      data: {
-        title: article.title,
-        url: article.url,
-        explanation: article.explanation,
-        email: article.email,
-        dateAdded: dateAdded,
-      },
-    };
-  };
-
   const onSuccess = (article) => {
     toast(`Article Updated - id: ${article.id} title: ${article.title}`);
   };
 
   const mutation = useBackendMutation(
-    objectToAxiosPutParams,
+    articleToPutParams,
     { onSuccess },
     // Stryker disable next-line all : hard to set up test for caching
     [`/api/articles?id=${id}`],
