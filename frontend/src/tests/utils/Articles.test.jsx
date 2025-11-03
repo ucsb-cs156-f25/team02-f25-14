@@ -101,6 +101,20 @@ describe("ArticlesUtils", () => {
 
       expect(result.params.dateAdded).toBe("2023-11-10T09:30:45");
     });
+
+    test("returns undefined date when not provided", () => {
+      const article = {
+        title: "Title",
+        url: "https://example.com",
+        explanation: "Explain",
+        email: "user@example.com",
+        dateAdded: undefined,
+      };
+
+      const result = articleToCreateParams(article);
+
+      expect(result.params.dateAdded).toBeUndefined();
+    });
   });
 
   describe("articleToPutParams", () => {
@@ -141,6 +155,21 @@ describe("ArticlesUtils", () => {
       const result = articleToPutParams(article);
 
       expect(result.data.dateAdded).toBe("2023-11-10T09:30:45");
+    });
+
+    test("handles undefined date without normalization", () => {
+      const article = {
+        id: 9,
+        title: "Title",
+        url: "https://example.com",
+        explanation: "Explain",
+        email: "user@example.com",
+        dateAdded: undefined,
+      };
+
+      const result = articleToPutParams(article);
+
+      expect(result.data.dateAdded).toBeUndefined();
     });
   });
 });
