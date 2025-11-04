@@ -28,7 +28,9 @@ describe("MenuItemReviewForm tests", () => {
   test("renders correctly when passing in a MenuItemReview", async () => {
     render(
       <Router>
-        <MenuItemReviewForm initialContents={menuItemReviewFixtures.oneReview} />
+        <MenuItemReviewForm
+          initialContents={menuItemReviewFixtures.oneReview}
+        />
       </Router>,
     );
     await screen.findByTestId(/MenuItemReview-id/);
@@ -43,17 +45,19 @@ describe("MenuItemReviewForm tests", () => {
       </Router>,
     );
 
-  await screen.findByTestId("MenuItemReview-itemId");
-  const starsField = screen.getByTestId("MenuItemReview-stars");
-  const dateReviewedField = screen.getByTestId("MenuItemReview-dateReviewed");
-  const submitButton = screen.getByTestId("MenuItemReview-submit");
+    await screen.findByTestId("MenuItemReview-itemId");
+    const starsField = screen.getByTestId("MenuItemReview-stars");
+    const dateReviewedField = screen.getByTestId("MenuItemReview-dateReviewed");
+    const submitButton = screen.getByTestId("MenuItemReview-submit");
 
-  fireEvent.change(starsField, { target: { value: 0 } });            // below min
-  fireEvent.change(dateReviewedField, { target: { value: "bad-date" } }); // invalid pattern
-  fireEvent.click(submitButton);
+    fireEvent.change(starsField, { target: { value: 0 } }); // below min
+    fireEvent.change(dateReviewedField, { target: { value: "bad-date" } }); // invalid pattern
+    fireEvent.click(submitButton);
 
-  expect(await screen.findByText(/Minimum 1 star/)).toBeInTheDocument();
-  expect(await screen.findByText(/dateReviewed is required/)).toBeInTheDocument();
+    expect(await screen.findByText(/Minimum 1 star/)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/dateReviewed is required/),
+    ).toBeInTheDocument();
   });
 
   test("Correct Error messsages on missing input", async () => {
@@ -84,7 +88,7 @@ describe("MenuItemReviewForm tests", () => {
     const starsField = screen.getByTestId("MenuItemReview-stars");
     const submitButton = screen.getByTestId("MenuItemReview-submit");
 
-    fireEvent.change(starsField, { target: { value: 6 } });     
+    fireEvent.change(starsField, { target: { value: 6 } });
     fireEvent.click(submitButton);
 
     expect(await screen.findByText(/Maximum 5 stars/)).toBeInTheDocument();
@@ -101,14 +105,18 @@ describe("MenuItemReviewForm tests", () => {
     await screen.findByTestId("MenuItemReview-itemId");
 
     const itemIdField = screen.getByTestId("MenuItemReview-itemId");
-    const reviewerEmailField = screen.getByTestId("MenuItemReview-reviewerEmail");
+    const reviewerEmailField = screen.getByTestId(
+      "MenuItemReview-reviewerEmail",
+    );
     const starsField = screen.getByTestId("MenuItemReview-stars");
     const dateReviewedField = screen.getByTestId("MenuItemReview-dateReviewed");
     const commentsField = screen.getByTestId("MenuItemReview-comments");
     const submitButton = screen.getByTestId("MenuItemReview-submit");
 
     fireEvent.change(itemIdField, { target: { value: 1 } });
-    fireEvent.change(reviewerEmailField, { target: { value: "cguacho@ucsb.edu" } });
+    fireEvent.change(reviewerEmailField, {
+      target: { value: "cguacho@ucsb.edu" },
+    });
     fireEvent.change(starsField, { target: { value: 4 } });
     fireEvent.change(dateReviewedField, {
       target: { value: "2022-01-02T12:00" },
@@ -118,9 +126,7 @@ describe("MenuItemReviewForm tests", () => {
 
     await waitFor(() => expect(mockSubmitAction).toHaveBeenCalled());
 
-    expect(
-      screen.queryByText(/Minimum 1 star/),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/Minimum 1 star/)).not.toBeInTheDocument();
   });
 
   test("that navigate(-1) is called when Cancel is clicked", async () => {
