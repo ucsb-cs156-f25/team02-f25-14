@@ -63,7 +63,9 @@ describe("UCSBDiningCommonsMenuItemIndexPage tests", () => {
 
     // assert
     await waitFor(() => {
-      expect(screen.getByText(/Create UCSBDiningCommonsMenuItem/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Create UCSBDiningCommonsMenuItem/),
+      ).toBeInTheDocument();
     });
     const button = screen.getByText(/Create UCSBDiningCommonsMenuItem/);
     expect(button).toHaveAttribute("href", "/diningcommonsmenuitem/create");
@@ -76,7 +78,10 @@ describe("UCSBDiningCommonsMenuItemIndexPage tests", () => {
     const queryClient = new QueryClient();
     axiosMock
       .onGet("/api/ucsbdiningcommonsmenuitem/all")
-      .reply(200, ucsbDiningCommonsMenuItemFixtures.threeDiningCommonsMenuItems);
+      .reply(
+        200,
+        ucsbDiningCommonsMenuItemFixtures.threeDiningCommonsMenuItems,
+      );
 
     // act
     render(
@@ -101,7 +106,9 @@ describe("UCSBDiningCommonsMenuItemIndexPage tests", () => {
     );
 
     // assert that the Create button is not present when user isn't an admin
-    expect(screen.queryByText(/Create UCSBDiningCommonsMenuItem/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/Create UCSBDiningCommonsMenuItem/),
+    ).not.toBeInTheDocument();
   });
 
   test("renders empty table when backend unavailable, user only", async () => {
@@ -142,7 +149,10 @@ describe("UCSBDiningCommonsMenuItemIndexPage tests", () => {
     const queryClient = new QueryClient();
     axiosMock
       .onGet("/api/ucsbdiningcommonsmenuitem/all")
-      .reply(200, ucsbDiningCommonsMenuItemFixtures.threeDiningCommonsMenuItems);
+      .reply(
+        200,
+        ucsbDiningCommonsMenuItemFixtures.threeDiningCommonsMenuItems,
+      );
     axiosMock
       .onDelete("/api/ucsbdiningcommonsmenuitem")
       .reply(200, "UCSBDiningCommonsMenuItem with id 1 was deleted");
@@ -177,7 +187,9 @@ describe("UCSBDiningCommonsMenuItemIndexPage tests", () => {
 
     // assert
     await waitFor(() => {
-      expect(mockToast).toBeCalledWith("UCSBDiningCommonsMenuItem with id 1 was deleted");
+      expect(mockToast).toBeCalledWith(
+        "UCSBDiningCommonsMenuItem with id 1 was deleted",
+      );
     });
   });
 });

@@ -46,7 +46,9 @@ describe("UCSBDiningCommonsMenuItemEditPage tests", () => {
       axiosMock
         .onGet("/api/systemInfo")
         .reply(200, systemInfoFixtures.showingNeither);
-      axiosMock.onGet("/api/ucsbdiningcommonsmenuitem", { params: { id: 17 } }).timeout();
+      axiosMock
+        .onGet("/api/ucsbdiningcommonsmenuitem", { params: { id: 17 } })
+        .timeout();
     });
 
     afterEach(() => {
@@ -88,12 +90,14 @@ describe("UCSBDiningCommonsMenuItemEditPage tests", () => {
       axiosMock
         .onGet("/api/systemInfo")
         .reply(200, systemInfoFixtures.showingNeither);
-      axiosMock.onGet("/api/ucsbdiningcommonsmenuitem", { params: { id: 17 } }).reply(200, {
-        id: 17,
-        diningCommonsCode: "ortega",
-        name: "Baked Pesto Pasta with Chicken",
-        station: "Entree Specials",
-      });
+      axiosMock
+        .onGet("/api/ucsbdiningcommonsmenuitem", { params: { id: 17 } })
+        .reply(200, {
+          id: 17,
+          diningCommonsCode: "ortega",
+          name: "Baked Pesto Pasta with Chicken",
+          station: "Entree Specials",
+        });
       axiosMock.onPut("/api/ucsbdiningcommonsmenuitem").reply(200, {
         id: "17",
         diningCommonsCode: "portola",
@@ -119,7 +123,9 @@ describe("UCSBDiningCommonsMenuItemEditPage tests", () => {
         </QueryClientProvider>,
       );
       await screen.findByText(/Welcome/);
-      await screen.findByTestId("UCSBDiningCommonsMenuItemForm-diningCommonsCode");
+      await screen.findByTestId(
+        "UCSBDiningCommonsMenuItemForm-diningCommonsCode",
+      );
       expect(
         screen.getByTestId("UCSBDiningCommonsMenuItemForm-diningCommonsCode"),
       ).toBeInTheDocument();
@@ -134,15 +140,23 @@ describe("UCSBDiningCommonsMenuItemEditPage tests", () => {
         </QueryClientProvider>,
       );
 
-      await screen.findByTestId("UCSBDiningCommonsMenuItemForm-diningCommonsCode");
+      await screen.findByTestId(
+        "UCSBDiningCommonsMenuItemForm-diningCommonsCode",
+      );
 
       const idField = screen.getByTestId("UCSBDiningCommonsMenuItemForm-id");
-      const diningCommonsCodeField = screen.getByTestId("UCSBDiningCommonsMenuItemForm-diningCommonsCode");
-      const nameField = screen.getByTestId("UCSBDiningCommonsMenuItemForm-name");
+      const diningCommonsCodeField = screen.getByTestId(
+        "UCSBDiningCommonsMenuItemForm-diningCommonsCode",
+      );
+      const nameField = screen.getByTestId(
+        "UCSBDiningCommonsMenuItemForm-name",
+      );
       const stationField = screen.getByTestId(
         "UCSBDiningCommonsMenuItemForm-station",
       );
-      const submitButton = screen.getByTestId("UCSBDiningCommonsMenuItemForm-submit");
+      const submitButton = screen.getByTestId(
+        "UCSBDiningCommonsMenuItemForm-submit",
+      );
 
       expect(idField).toHaveValue("17");
       expect(diningCommonsCodeField).toHaveValue("ortega");
@@ -160,15 +174,23 @@ describe("UCSBDiningCommonsMenuItemEditPage tests", () => {
         </QueryClientProvider>,
       );
 
-      await screen.findByTestId("UCSBDiningCommonsMenuItemForm-diningCommonsCode");
+      await screen.findByTestId(
+        "UCSBDiningCommonsMenuItemForm-diningCommonsCode",
+      );
 
       const idField = screen.getByTestId("UCSBDiningCommonsMenuItemForm-id");
-      const diningCommonsCodeField = screen.getByTestId("UCSBDiningCommonsMenuItemForm-diningCommonsCode");
-      const nameField = screen.getByTestId("UCSBDiningCommonsMenuItemForm-name");
+      const diningCommonsCodeField = screen.getByTestId(
+        "UCSBDiningCommonsMenuItemForm-diningCommonsCode",
+      );
+      const nameField = screen.getByTestId(
+        "UCSBDiningCommonsMenuItemForm-name",
+      );
       const stationField = screen.getByTestId(
         "UCSBDiningCommonsMenuItemForm-station",
       );
-      const submitButton = screen.getByTestId("UCSBDiningCommonsMenuItemForm-submit");
+      const submitButton = screen.getByTestId(
+        "UCSBDiningCommonsMenuItemForm-submit",
+      );
 
       expect(idField).toHaveValue("17");
       expect(diningCommonsCodeField).toHaveValue("ortega");
@@ -177,8 +199,12 @@ describe("UCSBDiningCommonsMenuItemEditPage tests", () => {
 
       expect(submitButton).toBeInTheDocument();
 
-      fireEvent.change(diningCommonsCodeField, { target: { value: "portola" } });
-      fireEvent.change(nameField, { target: { value: "Cream of Broccoli Soup (v)" } });
+      fireEvent.change(diningCommonsCodeField, {
+        target: { value: "portola" },
+      });
+      fireEvent.change(nameField, {
+        target: { value: "Cream of Broccoli Soup (v)" },
+      });
       fireEvent.change(stationField, {
         target: { value: "Grains & Greens" },
       });
