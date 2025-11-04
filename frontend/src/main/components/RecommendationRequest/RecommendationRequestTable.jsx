@@ -49,21 +49,21 @@ export default function RecommendationRequestTable({
       accessorKey: "professoremail",
     },
     {
-        header: "Explanation",
-        accessorKey: "explanation",
-      },
-      {
-        header: "Date Requested",
-        accessorKey: "daterequested",
-      },
-      {
-        header: "Date Needed",
-        accessorKey: "dateneeded",
-      },
-      {
-        header: "Done",
-        accessorKey: "done",
-      },
+      header: "Explanation",
+      accessorKey: "explanation",
+    },
+    {
+      header: "Date Requested",
+      accessorKey: "daterequested",
+    },
+    {
+      header: "Date Needed",
+      accessorKey: "dateneeded",
+    },
+    {
+      header: "Done",
+      accessorKey: "done",
+    },
   ];
 
   if (hasRole(currentUser, "ROLE_ADMIN")) {
@@ -74,6 +74,10 @@ export default function RecommendationRequestTable({
   }
 
   return (
-    <OurTable data={recommendationrequest} columns={columns} testid={testIdPrefix} />
+    <OurTable
+      data={recommendationrequest}
+      columns={columns}
+      testid={testIdPrefix}
+    />
   );
 }
