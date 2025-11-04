@@ -4,17 +4,17 @@ import { systemInfoFixtures } from "fixtures/systemInfoFixtures";
 import { helpRequestFixtures } from "fixtures/helpRequestFixtures";
 import { http, HttpResponse } from "msw";
 
-import HelpRequestEditPage from "main/pages/HelpRequest/HelpRequestEditPage";
+import HelpRequestIndexPage from "main/pages/HelpRequest/HelpRequestIndexPage";
 
 export default {
-  title: "pages/HelpRequest/HelpRequestEditPage",
-  component: HelpRequestEditPage,
+  title: "pages/HelpRequest/HelpRequestIndexPage",
+  component: HelpRequestIndexPage,
 };
 
-const Template = () => <HelpRequestEditPage storybook={true} />;
+const Template = () => <HelpRequestIndexPage storybook={true} />;
 
-export const Default = Template.bind({});
-Default.parameters = {
+export const Empty = Template.bind({});
+Empty.parameters = {
   msw: [
     http.get("/api/currentUser", () => {
       return HttpResponse.json(apiCurrentUserFixtures.userOnly, {
@@ -26,12 +26,42 @@ Default.parameters = {
         status: 200,
       });
     }),
-    http.get("/api/helprequest", () => {
-      return HttpResponse.json(helpRequestFixtures.threeDates[0], {
-        status: 200,
-      });
+    http.get("/api/helprequest/all", () => {
+      return HttpResponse.json([], { status: 200 });
     }),
-    http.put("/api/helprequest", () => {
+  ],
+};
+
+export const ThreeItemsOrdinaryUser = Template.bind({});
+
+ThreeItemsOrdinaryUser.parameters = {
+  msw: [
+    http.get("/api/currentUser", () => {
+      return HttpResponse.json(apiCurrentUserFixtures.userOnly);
+    }),
+    http.get("/api/systemInfo", () => {
+      return HttpResponse.json(systemInfoFixtures.showingNeither);
+    }),
+    http.get("/api/helprequest/all", () => {
+      return HttpResponse.json(helpRequestFixtures.threeDates);
+    }),
+  ],
+};
+
+export const ThreeItemsAdminUser = Template.bind({});
+
+ThreeItemsAdminUser.parameters = {
+  msw: [
+    http.get("/api/currentUser", () => {
+      return HttpResponse.json(apiCurrentUserFixtures.adminUser);
+    }),
+    http.get("/api/systemInfo", () => {
+      return HttpResponse.json(systemInfoFixtures.showingNeither);
+    }),
+    http.get("/api/helprequest/all", () => {
+      return HttpResponse.json(helpRequestFixtures.threeDates);
+    }),
+    http.delete("/api/helprequest", () => {
       return HttpResponse.json({}, { status: 200 });
     }),
   ],
