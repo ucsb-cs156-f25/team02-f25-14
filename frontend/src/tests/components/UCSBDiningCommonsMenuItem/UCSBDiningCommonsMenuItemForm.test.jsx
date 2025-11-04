@@ -29,7 +29,9 @@ describe("UCSBDiningCommonsMenuItemForm tests", () => {
     render(
       <Router>
         <UCSBDiningCommonsMenuItemForm
-          initialContents={ucsbDiningCommonsMenuItemFixtures.oneDiningCommonsMenuItem}
+          initialContents={
+            ucsbDiningCommonsMenuItemFixtures.oneDiningCommonsMenuItem
+          }
         />
       </Router>,
     );
