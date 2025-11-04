@@ -120,12 +120,12 @@ describe("UCSBOrganizationForm tests", () => {
         <Router>
           <UCSBOrganizationForm />
         </Router>
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
-  
+
     const submitButton = screen.getByText(/Create/);
     fireEvent.click(submitButton);
-  
+
     await waitFor(() => {
       expect(screen.getByText(/Inactive is required/i)).toBeInTheDocument();
     });
