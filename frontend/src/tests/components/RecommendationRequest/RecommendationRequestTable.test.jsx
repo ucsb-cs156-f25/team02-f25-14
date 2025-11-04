@@ -30,11 +30,11 @@ describe("RecommendationRequestTable tests", () => {
   ];
   const expectedFields = [
     "id",
-    "requesteremail",
-    "professoremail",
+    "requesterEmail",
+    "professorEmail",
     "explanation",
-    "daterequested",
-    "dateneeded",
+    "dateRequested",
+    "dateNeeded",
     "done",
   ];
   const testId = "RecommendationRequest";
@@ -100,14 +100,14 @@ describe("RecommendationRequestTable tests", () => {
       "1",
     );
     expect(
-      screen.getByTestId(`${testId}-cell-row-0-col-requesteremail`),
+      screen.getByTestId(`${testId}-cell-row-0-col-requesterEmail`),
     ).toHaveTextContent("bob@ucsb.edu");
 
     expect(screen.getByTestId(`${testId}-cell-row-1-col-id`)).toHaveTextContent(
       "2",
     );
     expect(
-      screen.getByTestId(`${testId}-cell-row-1-col-professoremail`),
+      screen.getByTestId(`${testId}-cell-row-1-col-professorEmail`),
     ).toHaveTextContent("profevan@ucsb.edu");
 
     const editButton = screen.getByTestId(
@@ -154,14 +154,14 @@ describe("RecommendationRequestTable tests", () => {
       "1",
     );
     expect(
-      screen.getByTestId(`${testId}-cell-row-0-col-requesteremail`),
+      screen.getByTestId(`${testId}-cell-row-0-col-requesterEmail`),
     ).toHaveTextContent("bob@ucsb.edu");
 
     expect(screen.getByTestId(`${testId}-cell-row-1-col-id`)).toHaveTextContent(
       "2",
     );
     expect(
-      screen.getByTestId(`${testId}-cell-row-1-col-professoremail`),
+      screen.getByTestId(`${testId}-cell-row-1-col-professorEmail`),
     ).toHaveTextContent("profevan@ucsb.edu");
 
     expect(
@@ -195,7 +195,7 @@ describe("RecommendationRequestTable tests", () => {
       await screen.findByTestId(`${testId}-cell-row-0-col-id`),
     ).toHaveTextContent("1");
     expect(
-      screen.getByTestId(`${testId}-cell-row-0-col-requesteremail`),
+      screen.getByTestId(`${testId}-cell-row-0-col-requesterEmail`),
     ).toHaveTextContent("bob@ucsb.edu");
 
     const editButton = screen.getByTestId(
@@ -240,7 +240,7 @@ describe("RecommendationRequestTable tests", () => {
       await screen.findByTestId(`${testId}-cell-row-0-col-id`),
     ).toHaveTextContent("1");
     expect(
-      screen.getByTestId(`${testId}-cell-row-0-col-requesteremail`),
+      screen.getByTestId(`${testId}-cell-row-0-col-requesterEmail`),
     ).toHaveTextContent("bob@ucsb.edu");
 
     const deleteButton = screen.getByTestId(
