@@ -56,58 +56,73 @@ describe("UCSBOrganizationCreatePage tests", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Name")).toBeInTheDocument();
+      expect(screen.getByLabelText("orgCode")).toBeInTheDocument();
     });
   });
 
   test("on submit, makes request to backend, and redirects to /ucsborganization", async () => {
     const queryClient = new QueryClient();
     const organization = {
-      id: 3,
-      name: "South Coast Deli",
-      description: "Sandwiches and Salads",
+      orgCode: "ZPR",
+      orgTranslationShort: "ZETA PHI RHO",
+      orgTranslation: "ZETA PHI RHO",
+      inactive: "false",
     };
 
-    axiosMock.onPost("/api/restaurants/post").reply(202, restaurant);
+    axiosMock.onPost("/api/ucsborganization/post").reply(202, organization);
 
     render(
       <QueryClientProvider client={queryClient}>
         <MemoryRouter>
-          <RestaurantCreatePage />
+          <UCSBOrganizationCreatePage />
         </MemoryRouter>
       </QueryClientProvider>,
     );
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Name")).toBeInTheDocument();
+      expect(screen.getByLabelText("orgCode")).toBeInTheDocument();
     });
 
-    const nameInput = screen.getByLabelText("Name");
-    expect(nameInput).toBeInTheDocument();
+    const orgCodeInput = screen.getByLabelText("orgCode");
+    expect(orgCodeInput).toBeInTheDocument();
 
-    const descriptionInput = screen.getByLabelText("Description");
-    expect(descriptionInput).toBeInTheDocument();
+    const orgTranslationShortInput = screen.getByLabelText(
+      "orgTranslationShort",
+    );
+    expect(orgTranslationShortInput).toBeInTheDocument();
+
+    const orgTranslationInput = screen.getByLabelText("orgTranslation");
+    expect(orgTranslationInput).toBeInTheDocument();
+
+    const inactiveInput = screen.getByLabelText("Inactive");
+    expect(inactiveInput).toBeInTheDocument();
 
     const createButton = screen.getByText("Create");
     expect(createButton).toBeInTheDocument();
 
-    fireEvent.change(nameInput, { target: { value: "South Coast Deli" } });
-    fireEvent.change(descriptionInput, {
-      target: { value: "Sandwiches and Salads" },
+    fireEvent.change(orgCodeInput, { target: { value: "ZPR" } });
+    fireEvent.change(orgTranslationShortInput, {
+      target: { value: "ZETA PHI RHO" },
     });
+    fireEvent.change(orgTranslationInput, {
+      target: { value: "ZETA PHI RHO" },
+    });
+    fireEvent.change(inactiveInput, { target: { value: "false" } });
     fireEvent.click(createButton);
 
     await waitFor(() => expect(axiosMock.history.post.length).toBe(1));
 
     expect(axiosMock.history.post[0].params).toEqual({
-      name: "South Coast Deli",
-      description: "Sandwiches and Salads",
+      orgCode: "ZPR",
+      orgTranslationShort: "ZETA PHI RHO",
+      orgTranslation: "ZETA PHI RHO",
+      inactive: "false",
     });
 
     // assert - check that the toast was called with the expected message
     expect(mockToast).toBeCalledWith(
-      "New restaurant Created - id: 3 name: South Coast Deli",
+      "New UCSBOrganization Created - orgCode: ZPR orgTranslationShort: ZETA PHI RHO",
     );
-    expect(mockNavigate).toBeCalledWith({ to: "/restaurants" });
+    expect(mockNavigate).toBeCalledWith({ to: "/ucsborganization" });
   });
 });
