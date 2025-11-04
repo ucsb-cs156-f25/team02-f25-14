@@ -147,7 +147,13 @@ describe("UserTable tests", () => {
     fireEvent.click(editButton);
 
     await waitFor(() =>
+<<<<<<< HEAD
+      expect(mockedNavigate).toHaveBeenCalledWith(
+        "/ucsbdiningcommonsmenuitem/edit/1",
+      ),
+=======
       expect(mockedNavigate).toHaveBeenCalledWith("/diningcommonsmenuitem/edit/1"),
+>>>>>>> 7ee8a5f142dbe6fe6e6388f62659dda43d7829aa
     );
   });
 
