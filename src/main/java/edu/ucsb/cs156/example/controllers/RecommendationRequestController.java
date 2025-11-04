@@ -42,8 +42,8 @@ public class RecommendationRequestController extends ApiController {
   /**
    * Create a new request
    *
-   * @param requesterEmail
-   * @param professorEmail
+   * @param requesteremail
+   * @param professoremail
    * @param daterequested
    * @param dateneeded
    * @param done
@@ -53,21 +53,21 @@ public class RecommendationRequestController extends ApiController {
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   @PostMapping("/post")
   public RecommendationRequest postRecommendationRequest(
-      @Parameter(name = "requesterEmail") @RequestParam String requesterEmail,
-      @Parameter(name = "professorEmail") @RequestParam String professorEmail,
+      @Parameter(name = "requesteremail") @RequestParam String requesteremail,
+      @Parameter(name = "professoremail") @RequestParam String professoremail,
       @Parameter(name = "explanation") @RequestParam String explanation,
       @Parameter(
               name = "daterequested",
               description =
                   "date (in iso format, e.g. YYYY-mm-ddTHH:MM:SS; see https://en.wikipedia.org/wiki/ISO_8601)")
-          @RequestParam("dateRequested")
+          @RequestParam("daterequested")
           @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
           LocalDateTime daterequested,
       @Parameter(
               name = "dateneeded",
               description =
                   "date (in iso format, e.g. YYYY-mm-ddTHH:MM:SS; see https://en.wikipedia.org/wiki/ISO_8601)")
-          @RequestParam("dateNeeded")
+          @RequestParam("dateneeded")
           @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
           LocalDateTime dateneeded,
       @Parameter(name = "done") @RequestParam boolean done)
@@ -80,8 +80,8 @@ public class RecommendationRequestController extends ApiController {
     log.info("localDateTime={}", dateneeded);
 
     RecommendationRequest request = new RecommendationRequest();
-    request.setRequesterEmail(requesterEmail);
-    request.setProfessorEmail(professorEmail);
+    request.setRequesterEmail(requesteremail);
+    request.setProfessorEmail(professoremail);
     request.setExplanation(explanation);
     request.setDateRequested(daterequested);
     request.setDateNeeded(dateneeded);
