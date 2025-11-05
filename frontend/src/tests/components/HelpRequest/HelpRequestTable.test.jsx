@@ -179,7 +179,7 @@ describe("HelpRequestTable tests", () => {
 
   test("Delete button calls delete callback", async () => {
     const currentUser = currentUserFixtures.adminUser;
-  
+
     const axiosMock = new AxiosMockAdapter(axios);
     // Match both `/api/helprequest` and `/api/helprequest?id=1`
     axiosMock
@@ -187,7 +187,7 @@ describe("HelpRequestTable tests", () => {
       .reply(200, { message: "Help Request deleted" });
     // Mock refetch endpoint
     axiosMock.onGet(/\/api\/helprequest\/all.*/).reply(200, []);
-  
+
     render(
       <QueryClientProvider client={queryClient}>
         <MemoryRouter>
@@ -198,30 +198,29 @@ describe("HelpRequestTable tests", () => {
         </MemoryRouter>
       </QueryClientProvider>,
     );
-  
+
     // Wait for table to render
     await screen.findByTestId(`HelpRequestTable-cell-row-0-col-id`);
-  
+
     const deleteButton = screen.getByTestId(
       `HelpRequestTable-cell-row-0-col-Delete-button`,
     );
     expect(deleteButton).toBeInTheDocument();
-  
+
     const { act } = await import("react-dom/test-utils");
     await act(async () => {
       fireEvent.click(deleteButton);
       // allow async React Query job to run
       await new Promise((resolve) => setTimeout(resolve, 0));
     });
-  
+
     await waitFor(
       () => expect(axiosMock.history.delete.length).toBeGreaterThan(0),
       { timeout: 5000 },
     );
-  
+
     const deleteReq = axiosMock.history.delete[0];
     expect(deleteReq.url).toMatch(/helprequest/);
     expect(deleteReq.params).toEqual({ id: 1 });
   });
-    
 });

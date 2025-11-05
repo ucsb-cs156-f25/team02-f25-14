@@ -6,11 +6,11 @@ export function onDeleteSuccess(message) {
 }
 
 export function cellToAxiosParamsDelete(cell) {
-  const id = cell?.row?.original.id ?? cell?.id;
-
   return {
-    url: "/api/helprequest",
+    url: "/api/ucsborganizations",
     method: "DELETE",
-    params: { id },
+    params: {
+      orgCode: cell.row.original.orgCode,
+    },
   };
 }
