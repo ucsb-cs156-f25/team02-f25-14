@@ -48,4 +48,3 @@ describe("ArticlesIndexPage tests", () => {
     expect(screen.getByText("Edit")).toBeInTheDocument();
   });
 });
-
