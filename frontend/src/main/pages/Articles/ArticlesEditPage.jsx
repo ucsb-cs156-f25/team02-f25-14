@@ -1,6 +1,9 @@
 import BasicLayout from "main/layouts/BasicLayout/BasicLayout";
 import { useParams } from "react-router";
 import ArticlesForm from "main/components/Articles/ArticlesForm";
+import {
+  ARTICLES_QUERY_KEY,
+} from "main/components/Articles/ArticlesTable";
 import { Navigate } from "react-router";
 import { useBackend, useBackendMutation } from "main/utils/useBackend";
 import { toast } from "react-toastify";
@@ -34,13 +37,14 @@ export default function ArticlesEditPage({ storybook = false }) {
     articleToPutParams,
     { onSuccess },
     // Stryker disable next-line all : hard to set up test for caching
-    [`/api/articles?id=${id}`],
+    [ARTICLES_QUERY_KEY],
   );
 
   const { isSuccess } = mutation;
 
   const onSubmit = async (data) => {
-    mutation.mutate(data);
+    const numericId = Number(id);
+    mutation.mutate({ ...data, id: Number.isNaN(numericId) ? id : numericId });
   };
 
   if (isSuccess && !storybook) {

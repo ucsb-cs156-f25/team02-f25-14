@@ -1,5 +1,5 @@
 const articlesFixtures = {
-  oneRestaurant: [
+  oneArticle: [
     {
       id: 1,
       title: "The Habit",
@@ -11,7 +11,7 @@ const articlesFixtures = {
     },
   ],
 
-  threeRestaurants: [
+  threeArticles: [
     {
       id: 2,
       title: "In-N-Out Burger",

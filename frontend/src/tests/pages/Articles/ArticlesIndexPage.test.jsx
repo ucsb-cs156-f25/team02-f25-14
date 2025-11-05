@@ -68,11 +68,11 @@ describe("ArticlesIndexPage tests", () => {
     expect(button).toHaveAttribute("style", "float: right;");
   });
 
-  test("renders three articles correctly for regular user", async () => {
+  test("renders articles table for regular user", async () => {
     setupUserOnly();
     axiosMock
       .onGet("/api/articles/all")
-      .reply(200, articlesFixtures.threeRestaurants);
+      .reply(200, articlesFixtures.threeArticles);
 
     render(
       <QueryClientProvider client={queryClient}>
@@ -94,18 +94,25 @@ describe("ArticlesIndexPage tests", () => {
       "4",
     );
 
-    const createArticleButton = screen.queryByText("Create Article");
-    expect(createArticleButton).not.toBeInTheDocument();
+    expect(screen.queryByText("Create Article")).not.toBeInTheDocument();
 
-    const title = screen.getByText("In-N-Out Burger");
-    expect(title).toBeInTheDocument();
-
-    const explanationCell = screen.getByTestId(
-      `${testId}-cell-row-0-col-explanation`,
-    );
-    expect(explanationCell).toHaveTextContent(
+    expect(
+      screen.getByTestId(`${testId}-cell-row-0-col-title`),
+    ).toHaveTextContent("In-N-Out Burger");
+    expect(
+      screen.getByTestId(`${testId}-cell-row-0-col-url`),
+    ).toHaveTextContent("https://www.in-n-out.com/");
+    expect(
+      screen.getByTestId(`${testId}-cell-row-0-col-explanation`),
+    ).toHaveTextContent(
       "A classic burger joint with a variety of tasty burgers and sides.",
     );
+    expect(
+      screen.getByTestId(`${testId}-cell-row-0-col-email`),
+    ).toHaveTextContent("innout@gmail.com");
+    expect(
+      screen.getByTestId(`${testId}-cell-row-0-col-dateAdded`),
+    ).toHaveTextContent("2023-10-02");
 
     expect(
       screen.queryByTestId("ArticlesTable-cell-row-0-col-Delete-button"),
@@ -146,10 +153,10 @@ describe("ArticlesIndexPage tests", () => {
 
     axiosMock
       .onGet("/api/articles/all")
-      .reply(200, articlesFixtures.threeRestaurants);
+      .reply(200, articlesFixtures.threeArticles);
     axiosMock
       .onDelete("/api/articles")
-      .reply(200, "Article with id 1 was deleted");
+      .reply(200, "Articles with id 2 deleted");
 
     render(
       <QueryClientProvider client={queryClient}>
@@ -177,7 +184,7 @@ describe("ArticlesIndexPage tests", () => {
     fireEvent.click(deleteButton);
 
     await waitFor(() => {
-      expect(mockToast).toBeCalledWith("Article with id 1 was deleted");
+      expect(mockToast).toBeCalledWith("Articles with id 2 deleted");
     });
 
     await waitFor(() => {
