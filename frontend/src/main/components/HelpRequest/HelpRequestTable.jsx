@@ -26,7 +26,7 @@ export default function HelpRequestTable({ helpRequests, currentUser }) {
   const deleteCallback = async (cell) => {
     // Support both possible shapes of cell
     const id = cell.row.original.id;
-  
+
     deleteMutation.mutate({ id });
   };
 
