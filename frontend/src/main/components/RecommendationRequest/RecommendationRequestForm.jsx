@@ -43,6 +43,7 @@ function RecommendationRequestForm({
       <Form.Group className="mb-3">
         <Form.Label htmlFor="requesterEmail">RequesterEmail</Form.Label>
         <Form.Control
+          data-testid={testIdPrefix + "-requesterEmail"}
           id="requesterEmail"
           type="text"
           isInvalid={Boolean(errors.requesterEmail)}
@@ -58,6 +59,7 @@ function RecommendationRequestForm({
       <Form.Group className="mb-3">
         <Form.Label htmlFor="professorEmail">ProfessorEmail</Form.Label>
         <Form.Control
+          data-testid={testIdPrefix + "-professorEmail"}
           id="professorEmail"
           type="text"
           isInvalid={Boolean(errors.professorEmail)}
@@ -73,6 +75,7 @@ function RecommendationRequestForm({
       <Form.Group className="mb-3">
         <Form.Label htmlFor="explanation">Explanation</Form.Label>
         <Form.Control
+          data-testid={testIdPrefix + "-explanation"}
           id="explanation"
           type="text"
           isInvalid={Boolean(errors.explanation)}
@@ -90,6 +93,7 @@ function RecommendationRequestForm({
           DateRequested (iso format)
         </Form.Label>
         <Form.Control
+          data-testid={testIdPrefix + "-dateRequested"}
           id="dateRequested"
           type="datetime-local"
           isInvalid={Boolean(errors.dateRequested)}
@@ -106,6 +110,7 @@ function RecommendationRequestForm({
       <Form.Group className="mb-3">
         <Form.Label htmlFor="dateNeeded">DateNeeded (iso format)</Form.Label>
         <Form.Control
+          data-testid={testIdPrefix + "-dateNeeded"}
           id="dateNeeded"
           type="datetime-local"
           isInvalid={Boolean(errors.dateNeeded)}
@@ -122,6 +127,7 @@ function RecommendationRequestForm({
       <Form.Group className="mb-3">
         <Form.Label htmlFor="done">Done?</Form.Label>
         <Form.Check
+          data-testid={testIdPrefix + "-done"}
           id="done"
           type="checkbox"
           label="Done"
@@ -135,7 +141,9 @@ function RecommendationRequestForm({
         </Form.Control.Feedback>
       </Form.Group>
 
-      <Button type="submit">{buttonLabel}</Button>
+      <Button type="submit" data-testid={testIdPrefix + "-submit"}>
+        {buttonLabel}
+      </Button>
       <Button
         variant="Secondary"
         onClick={() => navigate(-1)}
