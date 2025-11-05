@@ -1,5 +1,5 @@
 import { render, waitFor, fireEvent, screen } from "@testing-library/react";
-import HelpRequestCreatePage from "main/pages/HelpRequest/HelpRequestCreatePage";
+import UCSBDiningCommonsMenuItemCreatePage from "main/pages/UCSBDiningCommonsMenuItem/UCSBDiningCommonsMenuItemCreatePage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router";
 
@@ -29,7 +29,7 @@ vi.mock("react-router", async (importOriginal) => {
   };
 });
 
-describe("HelpRequestCreatePage tests", () => {
+describe("UCSBDiningCommonsMenuItemCreatePage tests", () => {
   const axiosMock = new AxiosMockAdapter(axios);
 
   beforeEach(() => {
@@ -45,87 +45,72 @@ describe("HelpRequestCreatePage tests", () => {
 
   test("renders without crashing", async () => {
     const queryClient = new QueryClient();
-
     render(
       <QueryClientProvider client={queryClient}>
         <MemoryRouter>
-          <HelpRequestCreatePage />
+          <UCSBDiningCommonsMenuItemCreatePage />
         </MemoryRouter>
       </QueryClientProvider>,
     );
 
     await waitFor(() => {
       expect(
-        screen.getByLabelText("Requester Email"),
+        screen.getByTestId("UCSBDiningCommonsMenuItemForm-diningCommonsCode"),
       ).toBeInTheDocument();
     });
   });
 
   test("when you fill in the form and hit submit, it makes a request to the backend", async () => {
     const queryClient = new QueryClient();
-    const helpRequest = {
-      id: 1,
-      requesterEmail: "cgaucho1@ucsb.edu",
-      teamId: "Group12-S25",
-      tableOrBreakoutRoom: "Breakout Room",
-      requestTime: "2025-05-01T00:00",
-      explanation: "Testing",
-      solved: true,
+    const ucsbDiningCommonsMenuItem = {
+      id: 17,
+      diningCommonsCodeField: "portola",
+      name: "Cream of Broccoli Soup (v)",
+      station: "Grains & Greens",
     };
 
-    axiosMock.onPost("/api/helprequest/post").reply(202, helpRequest);
+    axiosMock.onPost("/api/ucsbdiningcommonsmenuitem/post").reply(202, ucsbDiningCommonsMenuItem);
 
     render(
       <QueryClientProvider client={queryClient}>
         <MemoryRouter>
-          <HelpRequestCreatePage />
+          <UCSBDiningCommonsMenuItemCreatePage />
         </MemoryRouter>
       </QueryClientProvider>,
     );
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Requester Email")).toBeInTheDocument();
+      expect(
+        screen.getByTestId("UCSBDiningCommonsMenuItemForm-diningCommonsCode"),
+      ).toBeInTheDocument();
     });
 
-    const requesterEmailInput = screen.getByLabelText("Requester Email");
-    const teamIdInput = screen.getByLabelText("Team ID");
-    const tableInput = screen.getByLabelText("Table/Breakout Room");
-    const requestTimeInput = screen.getByLabelText("Request Time");
-    const explanationInput = screen.getByLabelText("Explanation");
-    const solvedCheckbox = screen.getByLabelText("Solved");
-    const createButton = screen.getByText("Create");
+    const diningCommonsCodeField = screen.getByTestId("UCSBDiningCommonsMenuItemForm-diningCommonsCode");
+    const nameField = screen.getByTestId("UCSBDiningCommonsMenuItemForm-name");
+    const stationField = screen.getByTestId("UCSBDiningCommonsMenuItemForm-station");
+    const submitButton = screen.getByTestId("UCSBDiningCommonsMenuItemForm-submit");
 
-    // fill out form
-    fireEvent.change(requesterEmailInput, {
-      target: { value: "cgaucho1@ucsb.edu" },
+    fireEvent.change(diningCommonsCodeField, { target: { value: "portola" } });
+    fireEvent.change(nameField, { target: { value: "Cream of Broccoli Soup (v)" } });
+    fireEvent.change(stationField, {
+      target: { value: "Greens & Grains" },
     });
-    fireEvent.change(teamIdInput, { target: { value: "Group12-S25" } });
-    fireEvent.change(tableInput, { target: { value: "Breakout Room" } });
-    fireEvent.change(requestTimeInput, {
-      target: { value: "2025-05-01T00:00" },
-    });
-    fireEvent.change(explanationInput, { target: { value: "Testing" } });
-    fireEvent.click(solvedCheckbox);
 
-    // submit form
-    fireEvent.click(createButton);
+    expect(submitButton).toBeInTheDocument();
+
+    fireEvent.click(submitButton);
 
     await waitFor(() => expect(axiosMock.history.post.length).toBe(1));
 
-    // assert correct backend parameters
     expect(axiosMock.history.post[0].params).toEqual({
-      requesterEmail: "cgaucho1@ucsb.edu",
-      teamId: "Group12-S25",
-      tableOrBreakoutRoom: "Breakout Room",
-      requestTime: "2025-05-01T00:00",
-      explanation: "Testing",
-      solved: true,
+      station: "Greens & Grains",
+      name: "Cream of Broccoli Soup (v)",
+      diningCommonsCode: "portola",
     });
 
-    // toast + redirect
     expect(mockToast).toBeCalledWith(
-      "New helpRequest Created - id: 1 requesterEmail: cgaucho1@ucsb.edu",
+      "New ucsbDiningCommonsMenuItem Created - id: 17 name: Cream of Broccoli Soup (v)",
     );
-    expect(mockNavigate).toBeCalledWith({ to: "/helprequest" });
+    expect(mockNavigate).toBeCalledWith({ to: "/diningcommonsmenuitem" });
   });
 });
