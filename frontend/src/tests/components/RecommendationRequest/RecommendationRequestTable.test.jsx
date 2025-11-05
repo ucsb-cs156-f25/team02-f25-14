@@ -1,5 +1,5 @@
 import { fireEvent, render, waitFor, screen } from "@testing-library/react";
-import { recommendationRequestFixture} from "fixtures/recommendationRequestFixture";
+import { recommendationRequestFixture } from "fixtures/recommendationRequestFixture";
 import RecommendationRequestTable from "main/components/RecommendationRequest/RecommendationRequestTable";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router";
@@ -19,8 +19,24 @@ vi.mock("react-router", async () => {
 describe("RecommendationRequestTable tests", () => {
   const queryClient = new QueryClient();
 
-  const expectedHeaders = ["id", "Requester Email", "Professor Email", "Explanation", "Date Requested", "Date Needed", "Done"];
-  const expectedFields = ["id", "requesteremail", "professoremail", "explanation", "daterequested", "dateneeded", "done"];
+  const expectedHeaders = [
+    "id",
+    "Requester Email",
+    "Professor Email",
+    "Explanation",
+    "Date Requested",
+    "Date Needed",
+    "Done",
+  ];
+  const expectedFields = [
+    "id",
+    "requesteremail",
+    "professoremail",
+    "explanation",
+    "daterequested",
+    "dateneeded",
+    "done",
+  ];
   const testId = "RecommendationRequest";
 
   test("renders empty table correctly", () => {
@@ -31,7 +47,10 @@ describe("RecommendationRequestTable tests", () => {
     render(
       <QueryClientProvider client={queryClient}>
         <MemoryRouter>
-          <RecommendationRequestTable recommendationrequest={[]} currentUser={currentUser} />
+          <RecommendationRequestTable
+            recommendationrequest={[]}
+            currentUser={currentUser}
+          />
         </MemoryRouter>
       </QueryClientProvider>,
     );
@@ -122,31 +141,37 @@ describe("RecommendationRequestTable tests", () => {
 
     // assert
     expectedHeaders.forEach((headerText) => {
-        const header = screen.getByText(headerText);
-        expect(header).toBeInTheDocument();
-      });
-  
-      expectedFields.forEach((field) => {
-        const header = screen.getByTestId(`${testId}-cell-row-0-col-${field}`);
-        expect(header).toBeInTheDocument();
-      });
-  
-      expect(screen.getByTestId(`${testId}-cell-row-0-col-id`)).toHaveTextContent(
-        "1",
-      );
-      expect(
-        screen.getByTestId(`${testId}-cell-row-0-col-requesteremail`),
-      ).toHaveTextContent("bob@ucsb.edu");
-  
-      expect(screen.getByTestId(`${testId}-cell-row-1-col-id`)).toHaveTextContent(
-        "2",
-      );
-      expect(
-        screen.getByTestId(`${testId}-cell-row-1-col-professoremail`),
-      ).toHaveTextContent("profevan@ucsb.edu");
+      const header = screen.getByText(headerText);
+      expect(header).toBeInTheDocument();
+    });
 
-    expect(screen.queryByTestId("RecommendationRequest-cell-row-0-col-Edit-button")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("RecommendationRequest-cell-row-0-col-Delete-button")).not.toBeInTheDocument();
+    expectedFields.forEach((field) => {
+      const header = screen.getByTestId(`${testId}-cell-row-0-col-${field}`);
+      expect(header).toBeInTheDocument();
+    });
+
+    expect(screen.getByTestId(`${testId}-cell-row-0-col-id`)).toHaveTextContent(
+      "1",
+    );
+    expect(
+      screen.getByTestId(`${testId}-cell-row-0-col-requesteremail`),
+    ).toHaveTextContent("bob@ucsb.edu");
+
+    expect(screen.getByTestId(`${testId}-cell-row-1-col-id`)).toHaveTextContent(
+      "2",
+    );
+    expect(
+      screen.getByTestId(`${testId}-cell-row-1-col-professoremail`),
+    ).toHaveTextContent("profevan@ucsb.edu");
+
+    expect(
+      screen.queryByTestId("RecommendationRequest-cell-row-0-col-Edit-button"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId(
+        "RecommendationRequest-cell-row-0-col-Delete-button",
+      ),
+    ).not.toBeInTheDocument();
   });
 
   test("Edit button navigates to the edit page", async () => {
@@ -183,7 +208,9 @@ describe("RecommendationRequestTable tests", () => {
 
     // assert - check that the navigate function was called with the expected path
     await waitFor(() =>
-      expect(mockedNavigate).toHaveBeenCalledWith("/recommendationrequests/edit/1"),
+      expect(mockedNavigate).toHaveBeenCalledWith(
+        "/recommendationrequests/edit/1",
+      ),
     );
   });
 
