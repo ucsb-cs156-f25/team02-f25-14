@@ -43,6 +43,7 @@ export default defineConfig({
       reporter: [
         'html',
         'text-summary',
+        'text',
       ],
     },
   },
