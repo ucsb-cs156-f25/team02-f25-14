@@ -53,7 +53,7 @@ function App() {
         <>
           <Route
             exact
-            path="/ucsbdates/edit/:id"
+            path="/ucsbdates/edit/:orgCode"
             element={<UCSBDatesEditPage />}
           />
           <Route
@@ -79,7 +79,7 @@ function App() {
         <>
           <Route
             exact
-            path="/ucsborganization/edit/:id"
+            path="/ucsborganization/edit/:orgCode"
             element={<UCSBOrganizationEditPage />}
           />
           <Route
