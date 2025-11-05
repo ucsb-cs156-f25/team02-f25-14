@@ -7,7 +7,7 @@ import mockConsole from "tests/testutils/mockConsole";
 const mockToast = vi.fn();
 vi.mock("react-toastify", async (importOriginal) => {
   const originalModule = await importOriginal();
-  return{ 
+  return {
     ...originalModule,
     toast: vi.fn((x) => mockToast(x)),
   };
