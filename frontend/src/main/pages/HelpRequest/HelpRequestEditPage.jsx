@@ -17,21 +17,17 @@ export default function HelpRequestEditPage({ storybook = false }) {
     // Stryker disable next-line all : don't test internal caching of React Query
     [`/api/helprequest?id=${id}`],
     {
-      // Stryker disable next-line all : GET is the default, so changing this to "" doesn't introduce a bug
+      // Stryker disable next-line all : GET is default, so changing it doesn't introduce a bug
       method: "GET",
       url: `/api/helprequest`,
-      params: {
-        id,
-      },
+      params: { id },
     },
   );
 
   const objectToAxiosPutParams = (helpRequest) => ({
     url: "/api/helprequest",
     method: "PUT",
-    params: {
-      id: helpRequest.id,
-    },
+    params: { id: helpRequest.id },
     data: {
       requesterEmail: helpRequest.requesterEmail,
       teamId: helpRequest.teamId,

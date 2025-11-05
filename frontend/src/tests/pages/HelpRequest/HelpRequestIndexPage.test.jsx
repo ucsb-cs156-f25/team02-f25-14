@@ -6,6 +6,7 @@ import HelpRequestIndexPage from "main/pages/HelpRequest/HelpRequestIndexPage";
 import { apiCurrentUserFixtures } from "fixtures/currentUserFixtures";
 import { systemInfoFixtures } from "fixtures/systemInfoFixtures";
 import { helpRequestFixtures } from "fixtures/helpRequestFixtures";
+
 import axios from "axios";
 import AxiosMockAdapter from "axios-mock-adapter";
 import mockConsole from "tests/testutils/mockConsole";
@@ -26,23 +27,15 @@ describe("HelpRequestIndexPage tests", () => {
   const setupUserOnly = () => {
     axiosMock.reset();
     axiosMock.resetHistory();
-    axiosMock
-      .onGet("/api/currentUser")
-      .reply(200, apiCurrentUserFixtures.userOnly);
-    axiosMock
-      .onGet("/api/systemInfo")
-      .reply(200, systemInfoFixtures.showingNeither);
+    axiosMock.onGet("/api/currentUser").reply(200, apiCurrentUserFixtures.userOnly);
+    axiosMock.onGet("/api/systemInfo").reply(200, systemInfoFixtures.showingNeither);
   };
 
   const setupAdminUser = () => {
     axiosMock.reset();
     axiosMock.resetHistory();
-    axiosMock
-      .onGet("/api/currentUser")
-      .reply(200, apiCurrentUserFixtures.adminUser);
-    axiosMock
-      .onGet("/api/systemInfo")
-      .reply(200, systemInfoFixtures.showingNeither);
+    axiosMock.onGet("/api/currentUser").reply(200, apiCurrentUserFixtures.adminUser);
+    axiosMock.onGet("/api/systemInfo").reply(200, systemInfoFixtures.showingNeither);
   };
 
   test("Renders with Create Button for admin user", async () => {
@@ -62,20 +55,18 @@ describe("HelpRequestIndexPage tests", () => {
 
     // assert
     await waitFor(() => {
-      expect(screen.getByText(/Create Help Request/)).toBeInTheDocument();
+      expect(screen.getByText(/Create HelpRequest/)).toBeInTheDocument();
     });
-    const button = screen.getByText(/Create Help Request/);
+    const button = screen.getByText(/Create HelpRequest/);
     expect(button).toHaveAttribute("href", "/helprequest/create");
     expect(button).toHaveAttribute("style", "float: right;");
   });
 
-  test("renders three help requests correctly for regular user", async () => {
+  test("renders three helpRequests correctly for regular user", async () => {
     // arrange
     setupUserOnly();
     const queryClient = new QueryClient();
-    axiosMock
-      .onGet("/api/helprequest/all")
-      .reply(200, helpRequestFixtures.threeHelpRequests);
+    axiosMock.onGet("/api/helprequest/all").reply(200, helpRequestFixtures.threeHelpRequests);
 
     // act
     render(
@@ -86,21 +77,17 @@ describe("HelpRequestIndexPage tests", () => {
       </QueryClientProvider>,
     );
 
-    // assert
+    // assert (check ids only to avoid fixture mismatch issues)
     await waitFor(() => {
-      expect(
-        screen.getByTestId(`${testId}-cell-row-0-col-id`),
-      ).toHaveTextContent("1");
+      expect(screen.getByTestId(`${testId}-cell-row-0-col-id`)).toHaveTextContent("1");
     });
-    expect(screen.getByTestId(`${testId}-cell-row-1-col-id`)).toHaveTextContent(
-      "2",
-    );
-    expect(screen.getByTestId(`${testId}-cell-row-2-col-id`)).toHaveTextContent(
-      "3",
-    );
+    expect(screen.getByTestId(`${testId}-cell-row-1-col-id`)).toHaveTextContent("2");
+    expect(screen.getByTestId(`${testId}-cell-row-2-col-id`)).toHaveTextContent("3");
 
-    // Create button not visible for non-admin
-    expect(screen.queryByText(/Create Help Request/)).not.toBeInTheDocument();
+    // Create button should NOT be present for non-admin
+    expect(screen.queryByText(/Create HelpRequest/)).not.toBeInTheDocument();
+
+
   });
 
   test("renders empty table when backend unavailable, user only", async () => {
@@ -130,12 +117,11 @@ describe("HelpRequestIndexPage tests", () => {
     );
     restoreConsole();
 
-    expect(
-      screen.queryByTestId(`${testId}-cell-row-0-col-id`),
-    ).not.toBeInTheDocument();
+    // no rows rendered
+    expect(screen.queryByTestId(`${testId}-cell-row-0-col-id`)).not.toBeInTheDocument();
   });
 
-  test("when you click delete, admin sees toast", async () => {
+  test("delete button works for admin user", async () => {
     // arrange
     setupAdminUser();
     const queryClient = new QueryClient();
@@ -144,7 +130,7 @@ describe("HelpRequestIndexPage tests", () => {
       .reply(200, helpRequestFixtures.threeHelpRequests);
     axiosMock
       .onDelete("/api/helprequest")
-      .reply(200, "Help Request with id 1 was deleted");
+      .reply(200, "helpRequest with id 1 was deleted");
 
     // act
     render(
@@ -155,28 +141,21 @@ describe("HelpRequestIndexPage tests", () => {
       </QueryClientProvider>,
     );
 
-    // assert
+    // assert first row present
     await waitFor(() => {
-      expect(
-        screen.getByTestId(`${testId}-cell-row-0-col-id`),
-      ).toBeInTheDocument();
+      expect(screen.getByTestId(`${testId}-cell-row-0-col-id`)).toBeInTheDocument();
     });
+    expect(screen.getByTestId(`${testId}-cell-row-0-col-id`)).toHaveTextContent("1");
 
-    expect(screen.getByTestId(`${testId}-cell-row-0-col-id`)).toHaveTextContent(
-      "1",
-    );
-
-    const deleteButton = screen.getByTestId(
-      `${testId}-cell-row-0-col-Delete-button`,
-    );
+    // click Delete on row 0
+    const deleteButton = screen.getByTestId(`${testId}-cell-row-0-col-Delete-button`);
     expect(deleteButton).toBeInTheDocument();
-
-    // act
     fireEvent.click(deleteButton);
 
-    // assert
     await waitFor(() => {
-      expect(mockToast).toBeCalledWith("Help Request with id 1 was deleted");
+      expect(mockToast).toBeCalledWith("helpRequest with id 1 was deleted");
     });
+
+
   });
 });

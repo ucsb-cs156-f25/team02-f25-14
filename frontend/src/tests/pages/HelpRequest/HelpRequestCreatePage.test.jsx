@@ -56,22 +56,21 @@ describe("HelpRequestCreatePage tests", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByTestId("HelpRequestForm-requesterEmail"),
+        screen.getByLabelText("Requester Email"),
       ).toBeInTheDocument();
     });
   });
 
-  test("when you fill in the form and hit submit, it makes a POST request to backend", async () => {
+  test("when you fill in the form and hit submit, it makes a request to the backend", async () => {
     const queryClient = new QueryClient();
-
     const helpRequest = {
-      id: 17,
-      requesterEmail: "student1@ucsb.edu",
-      teamId: "team02",
-      tableOrBreakoutRoom: "5",
-      requestTime: "2025-10-30T12:00:00",
-      explanation: "Need help debugging backend issue",
-      solved: false,
+      id: 1,
+      requesterEmail: "cgaucho1@ucsb.edu",
+      teamId: "Group12-S25",
+      tableOrBreakoutRoom: "Breakout Room",
+      requestTime: "2025-05-01T00:00",
+      explanation: "Testing",
+      solved: true,
     };
 
     axiosMock.onPost("/api/helprequest/post").reply(202, helpRequest);
@@ -85,50 +84,47 @@ describe("HelpRequestCreatePage tests", () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByTestId("HelpRequestForm-requesterEmail"),
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText("Requester Email")).toBeInTheDocument();
     });
 
-    const requesterEmailField = screen.getByTestId(
-      "HelpRequestForm-requesterEmail",
-    );
-    const teamIdField = screen.getByTestId("HelpRequestForm-teamId");
-    const tableField = screen.getByTestId(
-      "HelpRequestForm-tableOrBreakoutRoom",
-    );
-    const requestTimeField = screen.getByTestId("HelpRequestForm-requestTime");
-    const explanationField = screen.getByTestId("HelpRequestForm-explanation");
-    const solvedCheckbox = screen.getByTestId("HelpRequestForm-solved");
-    const submitButton = screen.getByTestId("HelpRequestForm-submit");
+    const requesterEmailInput = screen.getByLabelText("Requester Email");
+    const teamIdInput = screen.getByLabelText("Team ID");
+    const tableInput = screen.getByLabelText("Table/Breakout Room");
+    const requestTimeInput = screen.getByLabelText("Request Time");
+    const explanationInput = screen.getByLabelText("Explanation");
+    const solvedCheckbox = screen.getByLabelText("Solved");
+    const createButton = screen.getByText("Create");
 
-    fireEvent.change(requesterEmailField, {
-      target: { value: "student1@ucsb.edu" },
+    // fill out form
+    fireEvent.change(requesterEmailInput, {
+      target: { value: "cgaucho1@ucsb.edu" },
     });
-    fireEvent.change(teamIdField, { target: { value: "team02" } });
-    fireEvent.change(tableField, { target: { value: "5" } });
-    fireEvent.change(requestTimeField, {
-      target: { value: "2025-10-30T12:00:00" },
+    fireEvent.change(teamIdInput, { target: { value: "Group12-S25" } });
+    fireEvent.change(tableInput, { target: { value: "Breakout Room" } });
+    fireEvent.change(requestTimeInput, {
+      target: { value: "2025-05-01T00:00" },
     });
-    fireEvent.change(explanationField, {
-      target: { value: "Need help debugging backend issue" },
-    });
-    fireEvent.click(solvedCheckbox); // toggle solved state if relevant
-    fireEvent.click(submitButton);
+    fireEvent.change(explanationInput, { target: { value: "Testing" } });
+    fireEvent.click(solvedCheckbox);
+
+    // submit form
+    fireEvent.click(createButton);
 
     await waitFor(() => expect(axiosMock.history.post.length).toBe(1));
 
+    // assert correct backend parameters
     expect(axiosMock.history.post[0].params).toEqual({
-      requesterEmail: "student1@ucsb.edu",
-      teamId: "team02",
-      tableOrBreakoutRoom: "5",
-      requestTime: "2025-10-30T12:00:00",
-      explanation: "Need help debugging backend issue",
+      requesterEmail: "cgaucho1@ucsb.edu",
+      teamId: "Group12-S25",
+      tableOrBreakoutRoom: "Breakout Room",
+      requestTime: "2025-05-01T00:00",
+      explanation: "Testing",
       solved: true,
     });
 
+    // toast + redirect
     expect(mockToast).toBeCalledWith(
-      "New Help Request Created - id: 17 requesterEmail: student1@ucsb.edu",
+      "New helpRequest Created - id: 1 requesterEmail: cgaucho1@ucsb.edu",
     );
     expect(mockNavigate).toBeCalledWith({ to: "/helprequest" });
   });

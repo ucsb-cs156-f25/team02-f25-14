@@ -4,9 +4,6 @@ import { Navigate } from "react-router";
 import { useBackendMutation } from "main/utils/useBackend";
 import { toast } from "react-toastify";
 
-
-
-
 export default function HelpRequestCreatePage({ storybook = false }) {
   const objectToAxiosParams = (helpRequest) => ({
     url: "/api/helprequest/post",
