@@ -26,7 +26,9 @@ describe("UserTable tests", () => {
       <QueryClientProvider client={queryClient}>
         <MemoryRouter>
           <UCSBDiningCommonsMenuItemTable
-            dates={ucsbDiningCommonsMenuItemFixtures.threeDiningCommonsMenuItems}
+            dates={
+              ucsbDiningCommonsMenuItemFixtures.threeDiningCommonsMenuItems
+            }
             currentUser={currentUser}
           />
         </MemoryRouter>
@@ -72,7 +74,9 @@ describe("UserTable tests", () => {
       <QueryClientProvider client={queryClient}>
         <MemoryRouter>
           <UCSBDiningCommonsMenuItemTable
-            dates={ucsbDiningCommonsMenuItemFixtures.threeDiningCommonsMenuItems}
+            dates={
+              ucsbDiningCommonsMenuItemFixtures.threeDiningCommonsMenuItems
+            }
             currentUser={currentUser}
           />
         </MemoryRouter>
@@ -120,7 +124,9 @@ describe("UserTable tests", () => {
       <QueryClientProvider client={queryClient}>
         <MemoryRouter>
           <UCSBDiningCommonsMenuItemTable
-            dates={ucsbDiningCommonsMenuItemFixtures.threeDiningCommonsMenuItems}
+            dates={
+              ucsbDiningCommonsMenuItemFixtures.threeDiningCommonsMenuItems
+            }
             currentUser={currentUser}
           />
         </MemoryRouter>
@@ -159,7 +165,9 @@ describe("UserTable tests", () => {
       <QueryClientProvider client={queryClient}>
         <MemoryRouter>
           <UCSBDiningCommonsMenuItemTable
-            dates={ucsbDiningCommonsMenuItemFixtures.threeDiningCommonsMenuItems}
+            dates={
+              ucsbDiningCommonsMenuItemFixtures.threeDiningCommonsMenuItems
+            }
             currentUser={currentUser}
           />
         </MemoryRouter>
