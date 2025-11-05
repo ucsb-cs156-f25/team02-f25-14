@@ -18,11 +18,12 @@ import lombok.NoArgsConstructor;
 public class RecommendationRequest {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private String requesteremail;
+  private Long id;
 
-  private String professoremail;
+  private String requesterEmail;
+  private String professorEmail;
   private String explanation;
-  private LocalDateTime daterequested;
-  private LocalDateTime dateneeded;
+  private LocalDateTime dateRequested;
+  private LocalDateTime dateNeeded;
   private boolean done;
 }
