@@ -42,11 +42,11 @@ export default function RecommendationRequestTable({
 
     {
       header: "Requester Email",
-      accessorKey: "requesteremail",
+      accessorKey: "requesterEmail",
     },
     {
       header: "Professor Email",
-      accessorKey: "professoremail",
+      accessorKey: "professorEmail",
     },
     {
       header: "Explanation",
@@ -54,11 +54,11 @@ export default function RecommendationRequestTable({
     },
     {
       header: "Date Requested",
-      accessorKey: "daterequested",
+      accessorKey: "dateRequested",
     },
     {
       header: "Date Needed",
-      accessorKey: "dateneeded",
+      accessorKey: "dateNeeded",
     },
     {
       header: "Done",
