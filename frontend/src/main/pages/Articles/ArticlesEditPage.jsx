@@ -1,0 +1,69 @@
+import BasicLayout from "main/layouts/BasicLayout/BasicLayout";
+import { useParams } from "react-router";
+import ArticlesForm from "main/components/Articles/ArticlesForm";
+import {
+  ARTICLES_QUERY_KEY,
+} from "main/components/Articles/ArticlesTable";
+import { Navigate } from "react-router";
+import { useBackend, useBackendMutation } from "main/utils/useBackend";
+import { toast } from "react-toastify";
+import { articleToPutParams } from "main/utils/ArticlesUtils";
+
+export default function ArticlesEditPage({ storybook = false }) {
+  let { id } = useParams();
+
+  const {
+    data: article,
+    _error,
+    _status,
+  } = useBackend(
+    // Stryker disable next-line all : don't test internal caching of React Query
+    [`/api/articles?id=${id}`],
+    {
+      // Stryker disable next-line all : GET is the default, so mutating this to "" doesn't introduce a bug
+      method: "GET",
+      url: `/api/articles`,
+      params: {
+        id,
+      },
+    },
+  );
+
+  const onSuccess = (article) => {
+    toast(`Article Updated - id: ${article.id} title: ${article.title}`);
+  };
+
+  const mutation = useBackendMutation(
+    articleToPutParams,
+    { onSuccess },
+    // Stryker disable next-line all : hard to set up test for caching
+    [ARTICLES_QUERY_KEY],
+  );
+
+  const { isSuccess } = mutation;
+
+  const onSubmit = async (data) => {
+    const numericId = Number(id);
+    mutation.mutate({ ...data, id: Number.isNaN(numericId) ? id : numericId });
+  };
+
+  if (isSuccess && !storybook) {
+    return <Navigate to="/articles" />;
+  }
+
+  return (
+    <BasicLayout>
+      <div className="pt-2">
+        <h1>Edit Article</h1>
+        {article && (
+          <ArticlesForm
+            submitAction={onSubmit}
+            buttonLabel={"Update"}
+            initialContents={article}
+          />
+        )}
+      </div>
+    </BasicLayout>
+  );
+}
+
