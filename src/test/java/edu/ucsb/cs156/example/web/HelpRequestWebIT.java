@@ -23,7 +23,7 @@ public class HelpRequestWebIT extends WebTestCase {
 
     page.getByText("HelpRequest").click();
 
-    page.getByText("Create Help Request").click();
+    page.getByText("Create HelpRequest").click();
     assertThat(page.getByText("Create New Help Request")).isVisible();
 
     page.getByTestId("HelpRequestForm-requesterEmail").fill("admin@ucsb.edu");
@@ -54,9 +54,9 @@ public class HelpRequestWebIT extends WebTestCase {
   public void regular_user_cannot_create_helprequest() throws Exception {
     setupUser(false);
 
-    page.getByText("Help Requests").click();
+    page.getByText("HelpRequest").click();
 
-    assertThat(page.getByText("Create Help Request")).not().isVisible();
+    assertThat(page.getByText("Create HelpRequest")).not().isVisible();
     assertThat(page.getByTestId("HelpRequestTable-cell-row-0-col-explanation")).not().isVisible();
   }
 }
