@@ -39,4 +39,3 @@ export default function ArticlesCreatePage({ storybook = false }) {
     </BasicLayout>
   );
 }
-

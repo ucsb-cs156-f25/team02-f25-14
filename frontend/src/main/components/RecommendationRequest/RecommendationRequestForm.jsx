@@ -41,32 +41,32 @@ function RecommendationRequestForm({
       )}
 
       <Form.Group className="mb-3">
-        <Form.Label htmlFor="requesteremail">RequesterEmail</Form.Label>
+        <Form.Label htmlFor="requesterEmail">RequesterEmail</Form.Label>
         <Form.Control
-          id="requesteremail"
+          id="requesterEmail"
           type="text"
-          isInvalid={Boolean(errors.requesteremail)}
-          {...register("requesteremail", {
+          isInvalid={Boolean(errors.requesterEmail)}
+          {...register("requesterEmail", {
             required: "Requester email is required.",
           })}
         />
         <Form.Control.Feedback type="invalid">
-          {errors.requesteremail?.message}
+          {errors.requesterEmail?.message}
         </Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group className="mb-3">
-        <Form.Label htmlFor="professoremail">ProfessorEmail</Form.Label>
+        <Form.Label htmlFor="professorEmail">ProfessorEmail</Form.Label>
         <Form.Control
-          id="professoremail"
+          id="professorEmail"
           type="text"
-          isInvalid={Boolean(errors.professoremail)}
-          {...register("professoremail", {
+          isInvalid={Boolean(errors.professorEmail)}
+          {...register("professorEmail", {
             required: "Professor email is required.",
           })}
         />
         <Form.Control.Feedback type="invalid">
-          {errors.professoremail?.message}
+          {errors.professorEmail?.message}
         </Form.Control.Feedback>
       </Form.Group>
 
@@ -108,7 +108,7 @@ function RecommendationRequestForm({
         <Form.Control
           id="dateNeeded"
           type="datetime-local"
-          isInvalid={Boolean(errors.dateRequested)}
+          isInvalid={Boolean(errors.dateNeeded)}
           {...register("dateNeeded", {
             required: true,
             pattern: isodate_regex,
