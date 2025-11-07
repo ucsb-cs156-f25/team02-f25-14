@@ -38,7 +38,7 @@ public class HelpRequestWebIT extends WebTestCase {
         .hasText("Need help with Docker setup");
 
     page.getByTestId("HelpRequestTable-cell-row-0-col-Edit-button").click();
-    assertThat(page.getByText("Edit Help Request")).isVisible();
+    assertThat(page.getByText("Edit HelpRequest")).isVisible();
     page.getByTestId("HelpRequestForm-explanation").fill("Problem resolved");
     page.getByTestId("HelpRequestForm-submit").click();
 
