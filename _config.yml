@@ -23,4 +23,4 @@ repo_name: "TBD"
 repo: ucsb-cs156-f25/team02-f25-14
 owner: ucsb-cs156-f25
 repo_name: team02-f25-14
-pull_requests: [{"author":{"id":"U_kgDOCujG6A","is_bot":false,"login":"danielc-285","name":""},"headRefName":"UCSBDiningCommonsMenuItem-e2e","number":134,"title":"dc - Create e2e test for UCSBDiningCommonsMenuItem","url":"https://github.com/ucsb-cs156-f25/team02-f25-14/pull/134"}]
+pull_requests: [{"author":{"id":"U_kgDOCVHRvw","is_bot":false,"login":"logan-melgoza","name":"Logan Melgoza"},"headRefName":"team03-logan-melgoza-integration","number":135,"title":"lm - added integration test for MenuItemReview","url":"https://github.com/ucsb-cs156-f25/team02-f25-14/pull/135"},{"author":{"id":"U_kgDOCujG6A","is_bot":false,"login":"danielc-285","name":""},"headRefName":"UCSBDiningCommonsMenuItem-e2e","number":134,"title":"dc - Create e2e test for UCSBDiningCommonsMenuItem","url":"https://github.com/ucsb-cs156-f25/team02-f25-14/pull/134"}]
