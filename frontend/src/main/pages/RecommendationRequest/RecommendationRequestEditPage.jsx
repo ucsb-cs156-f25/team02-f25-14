@@ -1,54 +1,55 @@
 import BasicLayout from "main/layouts/BasicLayout/BasicLayout";
 import { useParams } from "react-router";
-import UCSBOrganizationForm from "main/components/UCSBOrganization/UCSBOrganizationForm";
+import RecommendationRequestForm from "main/components/RecommendationRequest/RecommendationRequestForm";
 import { Navigate } from "react-router";
 import { useBackend, useBackendMutation } from "main/utils/useBackend";
 import { toast } from "react-toastify";
 
-export default function UCSBOrganizationEditPage({ storybook = false }) {
-  let { orgCode } = useParams();
+export default function RecommendationRequestEditPage({ storybook = false }) {
+  let { id } = useParams();
 
   const {
-    data: organization,
+    data: request,
     _error,
     _status,
   } = useBackend(
     // Stryker disable next-line all : don't test internal caching of React Query
-    [`/api/ucsborganization?orgCode=${orgCode}`],
+    [`/api/recommendationrequests?id=${id}`],
     {
       // Stryker disable next-line all : GET is the default, so mutating this to "" doesn't introduce a bug
       method: "GET",
-      url: `/api/ucsborganization`,
+      url: `/api/recommendationrequests`,
       params: {
-        orgCode,
+        id,
       },
     },
   );
 
-  const objectToAxiosPutParams = (organization) => ({
-    url: "/api/ucsborganization",
+  const objectToAxiosPutParams = (request) => ({
+    url: "/api/recommendationrequests",
     method: "PUT",
     params: {
-      orgCode: organization.orgCode,
+      id: request.id,
     },
     data: {
-      orgTranslationShort: organization.orgTranslationShort,
-      orgTranslation: organization.orgTranslation,
-      inactive: organization.inactive,
+      requesterEmail: request.requesterEmail,
+      professorEmail: request.professorEmail,
+      explanation: request.explanation,
+      dateRequested: request.dateRequested,
+      dateNeeded: request.dateNeeded,
+      done: request.done,
     },
   });
 
-  const onSuccess = (organization) => {
-    toast(
-      `UCSBOrganization Updated - orgCode: ${organization.orgCode} orgTranslationShort: ${organization.orgTranslationShort}`,
-    );
+  const onSuccess = (request) => {
+    toast(`RecommendationRequest Updated - id: ${request.id} requesteremail: ${request.requesterEmail}`);
   };
 
   const mutation = useBackendMutation(
     objectToAxiosPutParams,
     { onSuccess },
     // Stryker disable next-line all : hard to set up test for caching
-    [`/api/ucsborganization?orgCode=${orgCode}`],
+    [`/api/recommendationrequests?id=${id}`],
   );
 
   const { isSuccess } = mutation;
@@ -58,21 +59,22 @@ export default function UCSBOrganizationEditPage({ storybook = false }) {
   };
 
   if (isSuccess && !storybook) {
-    return <Navigate to="/ucsborganization" />;
+    return <Navigate to="/recommendationrequests" />;
   }
 
   return (
     <BasicLayout>
       <div className="pt-2">
-        <h1>Edit UCSBOrganization</h1>
-        {organization && (
-          <UCSBOrganizationForm
+        <h1>Edit Request</h1>
+        {request && (
+          <RecommendationRequestForm
             submitAction={onSubmit}
             buttonLabel={"Update"}
-            initialContents={organization}
+            initialContents={request}
           />
         )}
       </div>
     </BasicLayout>
   );
 }
+

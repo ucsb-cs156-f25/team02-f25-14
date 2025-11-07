@@ -193,9 +193,7 @@ describe("UCSBOrganizationTable tests", () => {
 
     // assert - check that the navigate function was called with the expected path
     await waitFor(() =>
-      expect(mockedNavigate).toHaveBeenCalledWith(
-        "/ucsborganizations/edit/ZPR",
-      ),
+      expect(mockedNavigate).toHaveBeenCalledWith("/ucsborganization/edit/ZPR"),
     );
   });
 
