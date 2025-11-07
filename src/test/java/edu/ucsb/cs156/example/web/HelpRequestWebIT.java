@@ -24,7 +24,7 @@ public class HelpRequestWebIT extends WebTestCase {
     page.getByText("HelpRequest").click();
 
     page.getByText("Create HelpRequest").click();
-    assertThat(page.getByText("Create New Help Request")).isVisible();
+    assertThat(page.getByText("Create New HelpRequest")).isVisible();
 
     page.getByTestId("HelpRequestForm-requesterEmail").fill("admin@ucsb.edu");
     page.getByTestId("HelpRequestForm-teamId").fill("11");
