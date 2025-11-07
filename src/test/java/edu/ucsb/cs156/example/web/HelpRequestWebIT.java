@@ -29,7 +29,7 @@ public class HelpRequestWebIT extends WebTestCase {
     page.getByTestId("HelpRequestForm-requesterEmail").fill("admin@ucsb.edu");
     page.getByTestId("HelpRequestForm-teamId").fill("11");
     page.getByTestId("HelpRequestForm-tableOrBreakoutRoom").fill("Table");
-    page.getByTestId("HelpRequestForm-requestTime").fill("2022-01-03T00:00:00");
+    page.getByTestId("HelpRequestForm-requestTime").fill("2022-01-03T00:00");
     page.getByTestId("HelpRequestForm-explanation").fill("Need help with Docker setup");
     page.getByTestId("HelpRequestForm-solved").check();
     page.getByTestId("HelpRequestForm-submit").click();
