@@ -126,13 +126,8 @@ function RecommendationRequestForm({
           type="checkbox"
           label="Done"
           isInvalid={Boolean(errors.done)}
-          {...register("done", {
-            required: "This is required.",
-          })}
+          {...register("done")}
         />
-        <Form.Control.Feedback type="invalid">
-          {errors.done?.message}
-        </Form.Control.Feedback>
       </Form.Group>
 
       <Button type="submit">{buttonLabel}</Button>

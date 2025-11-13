@@ -103,6 +103,5 @@ describe("recommendationRequestForm tests", () => {
     expect(screen.getByText(/Explanation is required./)).toBeInTheDocument();
     expect(screen.getByText(/Date requested is required./)).toBeInTheDocument();
     expect(screen.getByText(/Date needed is required./)).toBeInTheDocument();
-    expect(screen.getByText(/This is required./)).toBeInTheDocument();
   });
 });
